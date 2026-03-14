@@ -8,7 +8,7 @@ uvicorn[standard]==0.29.0
 python-multipart==0.0.9
 
 # Audio transcription (runs 100% locally, no API key)
-
+openai-whisper
 
 # Utilities
 aiofiles==23.2.1
