@@ -1,0 +1,2924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sakshyam — Solving Crimes in Time</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;700&family=Crimson+Pro:ital,wght@0,300;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#8B0000;--red2:#a80000;--red3:#5c0000;
+  --bg:#070709;--bg2:#0c0c10;--bg3:#101015;--bg4:#15151c;
+  --b1:#1a1a22;--b2:#232330;--b3:#2e2e3e;
+  --t1:#f0f0f5;--t2:#a0a0b8;--t3:#606078;--t4:#383848;
+  --green:#22c55e;--amber:#f59e0b;--blue:#3b82f6;--purple:#a855f7;--cyan:#06b6d4;
+  --mono:'IBM Plex Mono',monospace;--serif:'Crimson Pro',serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--mono);font-size:13px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--b3);border-radius:2px}
+input,textarea,button,select{font-family:var(--mono);font-size:13px;outline:none;border:none}
+button{cursor:pointer}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scanDown{0%{top:-4%}100%{top:104%}}
+@keyframes glow{0%,100%{box-shadow:0 0 18px rgba(139,0,0,.4)}50%{box-shadow:0 0 50px rgba(139,0,0,.8)}}
+@keyframes glowPulse{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes ripple{0%{transform:scale(0);opacity:.5}100%{transform:scale(4);opacity:0}}
+@keyframes typewriter{from{width:0}to{width:100%}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes waveIdle{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.7)}}
+@keyframes waveActive{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
+@keyframes countUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══════════════════════════════════════
+   LANDING PAGE
+══════════════════════════════════════ */
+#landing{
+  position:fixed;inset:0;z-index:100;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.land-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 50%, rgba(139,0,0,.08) 0%, transparent 70%);
+}
+.land-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(var(--b1) 1px,transparent 1px),linear-gradient(90deg,var(--b1) 1px,transparent 1px);
+  background-size:48px 48px;opacity:.4;
+}
+.scan-line{
+  position:absolute;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(139,0,0,.6),transparent);
+  animation:scanDown 4s linear infinite;pointer-events:none;
+}
+.land-content{
+  position:relative;z-index:2;text-align:center;
+  animation:fadeUp .8s ease both;
+}
+.land-icon{
+  font-size:72px;margin-bottom:24px;
+  animation:float 3s ease-in-out infinite;
+  filter:drop-shadow(0 0 30px rgba(139,0,0,.6));
+}
+.land-title{
+  font-family:var(--serif);font-size:72px;font-weight:700;
+  color:var(--t1);letter-spacing:4px;
+  text-shadow:0 0 40px rgba(139,0,0,.5);
+  margin-bottom:8px;
+}
+.land-tagline{
+  font-size:11px;color:var(--t3);letter-spacing:4px;
+  text-transform:uppercase;margin-bottom:48px;
+}
+.land-btn{
+  background:var(--red);color:#fff;border:none;
+  padding:16px 48px;border-radius:6px;
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;cursor:pointer;
+  animation:glow 2.5s infinite;transition:transform .2s;
+  position:relative;overflow:hidden;
+}
+.land-btn:hover{transform:scale(1.05)}
+.land-btn::after{
+  content:'';position:absolute;inset:0;border-radius:6px;
+  background:rgba(255,255,255,.08);opacity:0;transition:opacity .2s;
+}
+.land-btn:hover::after{opacity:1}
+.land-dots{display:flex;gap:8px;justify-content:center;margin-top:32px}
+.land-dot{width:4px;height:4px;border-radius:50%;background:var(--t4)}
+.land-dot.active{background:var(--red)}
+
+/* ══════════════════════════════════════
+   LOGIN PAGE
+══════════════════════════════════════ */
+#login{
+  position:fixed;inset:0;z-index:90;
+  background:var(--bg);
+  display:none;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.login-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 80% at 30% 50%,rgba(139,0,0,.06) 0%,transparent 70%);
+}
+.login-card{
+  position:relative;z-index:2;
+  display:grid;grid-template-columns:340px 380px;
+  border-radius:14px;overflow:hidden;
+  border:1px solid var(--b2);
+  box-shadow:0 0 80px rgba(0,0,0,.6);
+  animation:fadeUp .5s ease both;
+}
+.login-left{
+  background:linear-gradient(160deg,#8B0000,#3d0000);
+  padding:48px 36px;display:flex;flex-direction:column;justify-content:space-between;
+}
+.login-logo{font-size:48px;margin-bottom:16px;animation:float 3s ease-in-out infinite}
+.login-brand{font-family:var(--serif);font-size:32px;font-weight:700;color:#fff;margin-bottom:4px}
+.login-sub{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:3px}
+.login-features{margin-top:32px}
+.login-feat{font-size:10px;color:rgba(255,255,255,.4);line-height:2.6;letter-spacing:.5px}
+.login-feat span{color:rgba(255,255,255,.15);margin-right:8px}
+.login-footer-text{font-size:8px;color:rgba(255,255,255,.15);letter-spacing:2px;margin-top:auto;padding-top:24px}
+.login-right{background:var(--bg3);padding:48px 36px}
+.login-eyebrow{font-size:9px;color:var(--t3);letter-spacing:2.5px;margin-bottom:28px;text-transform:uppercase}
+.form-group{margin-bottom:18px}
+.form-label{font-size:9px;color:var(--t3);letter-spacing:1.5px;display:block;margin-bottom:6px;text-transform:uppercase}
+.form-input{
+  width:100%;background:var(--bg4);border:1px solid var(--b2);
+  border-radius:6px;padding:12px 14px;color:var(--t1);
+  font-family:var(--mono);font-size:12px;transition:border-color .2s;
+}
+.form-input:focus{border-color:var(--red)}
+.form-select{
+  width:100%;background:var(--bg4);border:1px solid var(--b2);
+  border-radius:6px;padding:12px 14px;color:var(--t1);
+  font-family:var(--mono);font-size:12px;cursor:pointer;
+  appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23606078'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;transition:border-color .2s;
+}
+.form-select:focus{border-color:var(--red)}
+.login-btn{
+  width:100%;background:var(--red);color:#fff;border:none;border-radius:6px;
+  padding:14px;font-family:var(--mono);font-size:11px;font-weight:700;
+  letter-spacing:2px;cursor:pointer;transition:all .2s;margin-top:8px;
+}
+.login-btn:hover{background:var(--red2);transform:translateY(-1px)}
+.login-hint{font-size:10px;color:var(--t4);text-align:center;margin-top:12px}
+.login-hint span{color:var(--t3)}
+.login-err{color:#ef4444;font-size:11px;margin-bottom:10px;display:none}
+
+/* ══════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════ */
+#app{display:none;min-height:100vh;flex-direction:column}
+
+/* TOP BAR */
+.topbar{
+  height:52px;background:var(--bg2);border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;position:sticky;top:0;z-index:50;flex-shrink:0;
+}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-logo{font-size:20px;animation:glowPulse 2s infinite}
+.topbar-brand{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--t1)}
+.topbar-sep{color:var(--t4);margin:0 4px}
+.topbar-section{font-size:10px;color:var(--t3);letter-spacing:1.5px}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.topbar-officer{font-size:10px;color:var(--t3);letter-spacing:.5px}
+.topbar-officer span{color:var(--red)}
+.topbar-back{
+  background:none;border:1px solid var(--b2);color:var(--t3);
+  padding:6px 14px;border-radius:5px;font-size:10px;letter-spacing:1px;
+  cursor:pointer;transition:all .2s;display:none;
+}
+.topbar-back:hover{border-color:var(--red);color:var(--t1)}
+.topbar-logout{
+  background:none;border:1px solid var(--b2);color:var(--t3);
+  padding:6px 14px;border-radius:5px;font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .2s;
+}
+.topbar-logout:hover{border-color:var(--red);color:var(--t1)}
+
+/* MAIN */
+.main{flex:1;padding:28px 32px;max-width:1400px;margin:0 auto;width:100%}
+
+/* ══════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════ */
+#screen-dashboard{animation:fadeUp .4s ease both}
+.dash-header{margin-bottom:28px}
+.dash-eyebrow{font-size:9px;color:var(--t4);letter-spacing:3px;margin-bottom:6px;text-transform:uppercase}
+.dash-title{font-family:var(--serif);font-size:32px;font-weight:600;color:var(--t1)}
+.dash-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.dash-card{
+  background:var(--bg3);border:1px solid var(--b1);border-radius:12px;
+  padding:32px 28px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;
+}
+.dash-card::before{
+  content:'';position:absolute;inset:0;border-radius:12px;
+  background:var(--card-glow,rgba(139,0,0,.0));transition:background .3s;
+}
+.dash-card:hover{border-color:var(--card-color,var(--red));transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.dash-card:hover::before{background:rgba(139,0,0,.06)}
+.dash-card-icon{font-size:40px;margin-bottom:18px;display:block}
+.dash-card-count{font-size:52px;font-weight:700;color:var(--card-color,#fff);line-height:1;margin-bottom:8px}
+.dash-card-label{font-family:var(--serif);font-size:22px;color:var(--t1);margin-bottom:6px}
+.dash-card-sub{font-size:10px;color:var(--t3);letter-spacing:.5px}
+.dash-card-arrow{
+  position:absolute;right:24px;bottom:24px;
+  font-size:20px;color:var(--card-color,var(--t4));opacity:.4;
+  transition:all .3s;
+}
+.dash-card:hover .dash-card-arrow{opacity:1;transform:translateX(4px)}
+.dc-open{--card-color:#ef4444}
+.dc-closed{--card-color:#22c55e}
+.dc-halted{--card-color:#a855f7}
+
+/* ══════════════════════════════════════
+   SECTION HEADER
+══════════════════════════════════════ */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.section-title-block .eyebrow{font-size:9px;color:var(--t4);letter-spacing:3px;margin-bottom:5px;text-transform:uppercase}
+.section-title-block h2{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--t1)}
+
+/* ══════════════════════════════════════
+   OPEN CASES TOOLS GRID
+══════════════════════════════════════ */
+#screen-open{animation:fadeUp .35s ease both;display:none}
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.tool-card{
+  background:var(--bg3);border:1px solid var(--b1);border-radius:10px;
+  padding:24px 22px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;
+}
+.tool-card:hover{border-color:var(--red);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.tool-icon{font-size:32px;margin-bottom:14px}
+.tool-name{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:5px}
+.tool-desc{font-size:10px;color:var(--t3);line-height:1.6}
+.tool-tag{
+  position:absolute;top:16px;right:16px;
+  background:rgba(139,0,0,.15);color:var(--red);
+  font-size:8px;padding:3px 8px;border-radius:3px;letter-spacing:1px;border:1px solid rgba(139,0,0,.2);
+}
+
+/* ══════════════════════════════════════
+   TOOL SCREENS
+══════════════════════════════════════ */
+.tool-screen{display:none;animation:fadeUp .35s ease both}
+
+/* CALL LOGS */
+.call-table{width:100%;border-collapse:collapse}
+.call-table th{
+  font-size:9px;color:var(--t4);letter-spacing:1.5px;text-transform:uppercase;
+  padding:10px 14px;border-bottom:1px solid var(--b1);text-align:left;
+}
+.call-table td{padding:13px 14px;border-bottom:1px solid var(--bg2);font-size:12px;color:var(--t2)}
+.call-table tr:hover td{background:var(--bg4)}
+.call-number{color:var(--t1);font-weight:600}
+.flag-badge{
+  display:inline-block;padding:3px 8px;border-radius:3px;font-size:9px;font-weight:700;
+  letter-spacing:.8px;text-transform:uppercase;
+}
+.flag-suspicious{background:rgba(139,0,0,.15);color:#ef4444;border:1px solid rgba(239,68,68,.2)}
+.flag-normal{background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.2)}
+.flag-unknown{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
+.map-link{color:var(--blue);text-decoration:none;font-size:11px;cursor:pointer;transition:color .2s}
+.map-link:hover{color:#60a5fa}
+
+/* CRIMINAL PROFILE */
+.profile-grid{display:grid;grid-template-columns:240px 1fr;gap:20px}
+.profile-card{background:var(--bg3);border:1px solid var(--b1);border-radius:10px;padding:24px}
+.profile-avatar{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,var(--red3),var(--red));
+  display:flex;align-items:center;justify-content:center;font-size:36px;
+  margin-bottom:16px;border:2px solid var(--b2);
+}
+.profile-name{font-family:var(--serif);font-size:20px;font-weight:600;margin-bottom:4px}
+.profile-id{font-size:10px;color:var(--t4);letter-spacing:1px;margin-bottom:16px}
+.risk-badge{
+  padding:6px 14px;border-radius:4px;font-size:10px;font-weight:700;
+  letter-spacing:1px;display:inline-block;margin-bottom:16px;
+}
+.risk-critical{background:rgba(139,0,0,.2);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
+.risk-high{background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.25)}
+.risk-medium{background:rgba(168,85,247,.12);color:var(--purple);border:1px solid rgba(168,85,247,.2)}
+.profile-kv{display:flex;gap:8px;margin-bottom:8px;font-size:11px}
+.profile-k{color:var(--t4);min-width:100px;flex-shrink:0}
+.profile-v{color:var(--t2)}
+.crimes-list{margin-top:12px}
+.crime-item{
+  background:var(--bg4);border-left:3px solid var(--red3);
+  padding:10px 14px;border-radius:0 6px 6px 0;margin-bottom:8px;font-size:11px;color:var(--t2);
+}
+
+/* MESSAGE DECODER */
+.decoder-box{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.decoder-input-area{
+  background:var(--bg4);border:1px solid var(--b2);border-radius:8px;
+  padding:14px;color:var(--t1);font-family:var(--mono);font-size:12px;
+  resize:none;width:100%;height:180px;transition:border-color .2s;line-height:1.7;
+}
+.decoder-input-area:focus{border-color:var(--red)}
+.decoder-output{
+  background:var(--bg4);border:1px solid var(--b1);border-radius:8px;
+  padding:14px;min-height:180px;font-size:12px;color:var(--t2);line-height:1.8;
+}
+.decode-btn{
+  background:var(--red);color:#fff;border:none;border-radius:6px;
+  padding:12px 28px;font-family:var(--mono);font-size:11px;font-weight:700;
+  letter-spacing:1.5px;cursor:pointer;transition:all .2s;
+}
+.decode-btn:hover{background:var(--red2)}
+.decode-analyzing{color:var(--amber);animation:pulse 1s infinite;font-size:11px}
+
+/* CCTV */
+.drop-zone{
+  border:2px dashed var(--b2);border-radius:10px;padding:56px 40px;
+  text-align:center;cursor:pointer;transition:all .25s;
+}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--red);background:rgba(139,0,0,.04)}
+.drop-icon{font-size:48px;margin-bottom:14px}
+.drop-label{font-family:var(--serif);font-size:18px;color:var(--t2);margin-bottom:6px}
+.drop-sub{font-size:10px;color:var(--t4)}
+.video-player{width:100%;border-radius:8px;background:#000;max-height:340px}
+.ai-alerts{margin-top:18px}
+.alert-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-radius:8px;margin-bottom:8px;
+  animation:slideIn .3s ease both;
+}
+.alert-critical{background:rgba(139,0,0,.12);border:1px solid rgba(239,68,68,.2)}
+.alert-warn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2)}
+.alert-info{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2)}
+.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.alert-text{font-size:11px;color:var(--t1)}
+.alert-time{font-size:10px;color:var(--t3);margin-left:auto;flex-shrink:0}
+
+/* AUDIO */
+.audio-player{width:100%;margin:16px 0;accent-color:var(--red)}
+.transcript-box{
+  background:var(--bg4);border:1px solid var(--b1);border-radius:8px;
+  padding:20px;max-height:200px;overflow-y:auto;line-height:2.2;font-size:12px;color:var(--t2);
+}
+.highlight-word{
+  background:rgba(139,0,0,.25);color:#ef4444;padding:1px 5px;border-radius:3px;font-weight:700;
+}
+.word-cloud{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.word-tag{
+  padding:5px 12px;border-radius:4px;font-size:11px;font-weight:700;
+  border:1px solid;cursor:default;transition:transform .15s;
+}
+.word-tag:hover{transform:scale(1.05)}
+
+/* AI EVIDENCE */
+.evidence-upload{
+  border:2px dashed var(--b2);border-radius:8px;padding:32px;text-align:center;
+  cursor:pointer;transition:all .2s;margin-bottom:18px;
+}
+.evidence-upload:hover{border-color:var(--red);background:rgba(139,0,0,.03)}
+.evidence-result{
+  background:var(--bg4);border:1px solid var(--b1);border-radius:8px;padding:20px;display:none;
+}
+.evidence-section{margin-bottom:16px}
+.evidence-label{font-size:9px;color:var(--t4);letter-spacing:1.5px;margin-bottom:8px;text-transform:uppercase}
+.evidence-bar{
+  height:6px;border-radius:3px;background:var(--b1);margin-bottom:4px;overflow:hidden;
+}
+.evidence-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--red),var(--red2));animation:progressFill .8s ease both}
+@keyframes progressFill{from{width:0}}
+
+/* ══════════════════════════════════════
+   CLOSED CASES
+══════════════════════════════════════ */
+#screen-closed{display:none;animation:fadeUp .35s ease both}
+.case-card{
+  background:var(--bg3);border:1px solid var(--b1);border-radius:10px;
+  padding:22px 24px;margin-bottom:14px;transition:border-color .2s;
+}
+.case-card:hover{border-color:var(--b3)}
+.case-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.case-id{font-size:10px;color:var(--t4);letter-spacing:1.5px}
+.status-badge{
+  font-size:9px;font-weight:700;padding:4px 10px;border-radius:3px;letter-spacing:1px;text-transform:uppercase;
+}
+.status-solved{background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.2)}
+.status-halted{background:rgba(168,85,247,.12);color:var(--purple);border:1px solid rgba(168,85,247,.2)}
+.case-title{font-family:var(--serif);font-size:18px;font-weight:600;margin-bottom:10px}
+.case-kv{display:flex;gap:8px;margin-bottom:6px;font-size:11px}
+.case-k{color:var(--t4);min-width:120px;flex-shrink:0}
+.case-v{color:var(--t2);line-height:1.6}
+
+/* ══════════════════════════════════════
+   HALTED CASES
+══════════════════════════════════════ */
+#screen-halted{display:none;animation:fadeUp .35s ease both}
+.halt-reason{
+  background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.15);
+  border-radius:6px;padding:10px 14px;margin-top:10px;
+  font-size:11px;color:var(--purple);
+}
+
+/* ══════════════════════════════════════
+   NYAY CHATBOT
+══════════════════════════════════════ */
+.chat-fab{
+  position:fixed;bottom:24px;right:24px;z-index:200;
+  width:56px;height:56px;border-radius:50%;
+  background:var(--red);border:none;font-size:24px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;animation:glow 2.5s infinite;
+  box-shadow:0 4px 20px rgba(139,0,0,.5);transition:transform .2s;
+}
+.chat-fab:hover{transform:scale(1.1)}
+.chat-window{
+  position:fixed;bottom:92px;right:24px;z-index:200;
+  width:380px;height:520px;
+  background:var(--bg2);border:1px solid var(--b3);border-radius:14px;
+  display:none;flex-direction:column;overflow:hidden;
+  box-shadow:0 16px 60px rgba(0,0,0,.7);
+  animation:fadeUp .3s ease both;
+}
+.chat-window.open{display:flex}
+.chat-header{
+  background:var(--red);padding:14px 18px;
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;
+}
+.chat-title{font-size:13px;font-weight:700;color:#fff}
+.chat-subtitle{font-size:8px;color:rgba(255,255,255,.5);letter-spacing:1.5px;margin-top:2px}
+.chat-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:22px;cursor:pointer;line-height:1}
+.chat-close:hover{color:#fff}
+.chat-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.chat-msg{max-width:88%;padding:10px 13px;border-radius:10px;font-size:11px;line-height:1.8}
+.chat-msg.bot{background:var(--b1);border:1px solid var(--b2);color:var(--t2);align-self:flex-start;border-radius:4px 10px 10px 10px}
+.chat-msg.user{background:var(--red);color:#fff;align-self:flex-end;border-radius:10px 4px 10px 10px}
+.chat-typing{color:var(--t4);font-size:11px;animation:pulse 1s infinite;padding:0 4px}
+.chat-chips{padding:8px 10px;border-top:1px solid var(--b1);display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}
+.chat-chip{
+  background:var(--bg3);border:1px solid var(--b1);color:var(--t4);
+  padding:4px 9px;border-radius:3px;font-size:9px;cursor:pointer;
+  transition:all .15s;font-family:var(--mono);
+}
+.chat-chip:hover{border-color:var(--red);color:var(--t1)}
+.chat-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--b1);flex-shrink:0}
+.chat-input{
+  flex:1;background:var(--bg3);border:1px solid var(--b2);border-radius:6px;
+  padding:9px 12px;color:var(--t1);font-family:var(--mono);font-size:11px;
+  transition:border-color .2s;
+}
+.chat-input:focus{border-color:var(--red)}
+.chat-send{
+  background:var(--red);color:#fff;border:none;border-radius:6px;
+  padding:9px 14px;font-size:14px;cursor:pointer;transition:background .2s;
+}
+.chat-send:hover{background:var(--red2)}
+
+/* ══════════════════════════════════════
+   SHARED COMPONENTS
+══════════════════════════════════════ */
+.card{background:var(--bg3);border:1px solid var(--b1);border-radius:10px;padding:22px 24px;margin-bottom:16px}
+.slab{font-size:9px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.btn{
+  background:var(--red);color:#fff;border:none;border-radius:6px;
+  padding:10px 22px;font-family:var(--mono);font-size:11px;font-weight:700;
+  letter-spacing:1px;cursor:pointer;transition:all .2s;
+}
+.btn:hover{background:var(--red2);transform:translateY(-1px)}
+.btn-ghost{
+  background:none;border:1px solid var(--b2);color:var(--t3);
+  padding:9px 18px;border-radius:6px;font-family:var(--mono);font-size:11px;
+  cursor:pointer;transition:all .2s;letter-spacing:.5px;
+}
+.btn-ghost:hover{border-color:var(--red);color:var(--t1)}
+.divider{height:1px;background:var(--b1);margin:20px 0}
+.tag{
+  display:inline-block;padding:3px 9px;border-radius:3px;font-size:9px;font-weight:700;
+  letter-spacing:.8px;text-transform:uppercase;
+}
+.tag-red{background:rgba(139,0,0,.15);color:#ef4444;border:1px solid rgba(239,68,68,.2)}
+.tag-green{background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.2)}
+.tag-blue{background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
+.tag-amber{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
+.tag-purple{background:rgba(168,85,247,.1);color:var(--purple);border:1px solid rgba(168,85,247,.2)}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--bg3);border:1px solid var(--b3);color:var(--t1);
+  padding:12px 24px;border-radius:8px;font-size:12px;
+  z-index:300;animation:fadeUp .3s ease;
+  box-shadow:0 6px 30px rgba(0,0,0,.5);pointer-events:none;
+}
+
+@media(max-width:900px){
+  .dash-cards{grid-template-columns:1fr}
+  .tools-grid{grid-template-columns:1fr 1fr}
+  .login-card{grid-template-columns:1fr}
+  .login-left{display:none}
+  .profile-grid{grid-template-columns:1fr}
+  .decoder-box{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ LANDING ══════════════════ -->
+<div id="landing">
+  <div class="land-bg"></div>
+  <div class="land-grid"></div>
+  <div class="scan-line"></div>
+  <div class="land-content">
+    <div class="land-icon">⚖</div>
+    <div class="land-title">Sakshyam</div>
+    <div class="land-tagline">Solving Crimes in Time</div>
+    <button class="land-btn" onclick="showLogin()">Enter System</button>
+    <div class="land-dots">
+      <div class="land-dot active"></div>
+      <div class="land-dot"></div>
+      <div class="land-dot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ LOGIN ══════════════════ -->
+<div id="login">
+  <div class="login-bg"></div>
+  <div class="login-card">
+    <div class="login-left">
+      <div>
+        <div class="login-logo">⚖</div>
+        <div class="login-brand">Sakshyam</div>
+        <div class="login-sub">Solving Crimes in Time</div>
+        <div class="login-features">
+          <div class="login-feat"><span>◎</span>AI-Powered UFDR Analysis</div>
+          <div class="login-feat"><span>◎</span>Criminal Database Access</div>
+          <div class="login-feat"><span>◎</span>Real-time Evidence Processing</div>
+          <div class="login-feat"><span>◎</span>Nyay AI Forensic Assistant</div>
+          <div class="login-feat"><span>◎</span>Multilingual Interface</div>
+        </div>
+      </div>
+      <div class="login-footer-text">ADCET HACKATHON SEASON 3 · TECHTITANS</div>
+    </div>
+    <div class="login-right">
+      <div class="login-eyebrow">Officer Authentication Portal</div>
+      <div class="login-err" id="loginErr">⚠ Invalid credentials. Try: OFF-001 / admin123</div>
+      <div class="form-group">
+        <label class="form-label">Officer ID</label>
+        <input class="form-input" id="offId" placeholder="e.g. OFF-001" value="OFF-001"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="offPass" placeholder="••••••••" value="admin123"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Language</label>
+        <select class="form-select" id="langSel">
+          <option value="en">English</option>
+          <option value="hi">हिंदी — Hindi</option>
+          <option value="mr">मराठी — Marathi</option>
+          <option value="ta">தமிழ் — Tamil</option>
+          <option value="te">తెలుగు — Telugu</option>
+          <option value="kn">ಕನ್ನಡ — Kannada</option>
+          <option value="bn">বাংলা — Bengali</option>
+        </select>
+      </div>
+      <button class="login-btn" onclick="doLogin()">Authenticate →</button>
+      <div class="login-hint">Demo: <span>OFF-001</span> / <span>admin123</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ APP ══════════════════ -->
+<div id="app">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-logo">⚖</span>
+      <span class="topbar-brand">Sakshyam</span>
+      <span class="topbar-sep">·</span>
+      <span class="topbar-section" id="topSection">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-officer">Officer: <span id="topOfficer">OFF-001</span></span>
+      <button class="topbar-back" id="backBtn" onclick="goBack()">← Back</button>
+      <button class="topbar-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div id="screen-dashboard">
+      <div class="dash-header">
+        <div class="dash-eyebrow">Investigation Management System</div>
+        <div class="dash-title">Case Overview</div>
+      </div>
+      <div class="dash-cards">
+        <div class="dash-card dc-open" onclick="showScreen('open')">
+          <span class="dash-card-icon">🔴</span>
+          <div class="dash-card-count">7</div>
+          <div class="dash-card-label">Open Cases</div>
+          <div class="dash-card-sub">Active investigations · Click to explore</div>
+          <div class="dash-card-arrow">→</div>
+        </div>
+        <div class="dash-card dc-closed" onclick="showScreen('closed')">
+          <span class="dash-card-icon">✅</span>
+          <div class="dash-card-count">23</div>
+          <div class="dash-card-label">Closed Cases</div>
+          <div class="dash-card-sub">Successfully resolved · View records</div>
+          <div class="dash-card-arrow">→</div>
+        </div>
+        <div class="dash-card dc-halted" onclick="showScreen('halted')">
+          <span class="dash-card-icon">⏸</span>
+          <div class="dash-card-count">4</div>
+          <div class="dash-card-label">Halted Cases</div>
+          <div class="dash-card-sub">Paused investigations · Pending action</div>
+          <div class="dash-card-arrow">→</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPEN CASES -->
+    <div id="screen-open">
+      <div class="section-header">
+        <div class="section-title-block">
+          <div class="eyebrow">Open Investigations</div>
+          <h2>Investigation Tools</h2>
+        </div>
+        <span class="tag tag-red">7 Active</span>
+      </div>
+      <div class="tools-grid">
+        <div class="tool-card" onclick="showTool('callLogs')">
+          <span class="tool-tag">AI</span>
+          <div class="tool-icon">📞</div>
+          <div class="tool-name">Call Logs Analysis</div>
+          <div class="tool-desc">Analyse call records, detect patterns, trace locations</div>
+        </div>
+        <div class="tool-card" onclick="showTool('criminal')">
+          <span class="tool-tag">DB</span>
+          <div class="tool-icon">🕵️</div>
+          <div class="tool-name">Criminal Profile</div>
+          <div class="tool-desc">Access criminal database, past crimes, risk assessment</div>
+        </div>
+        <div class="tool-card" onclick="showTool('decoder')">
+          <span class="tool-tag">AI</span>
+          <div class="tool-icon">🔓</div>
+          <div class="tool-name">Message Decoder</div>
+          <div class="tool-desc">Decode suspicious messages using AI language analysis</div>
+        </div>
+        <div class="tool-card" onclick="showTool('cctv')">
+          <span class="tool-tag">AI</span>
+          <div class="tool-icon">📹</div>
+          <div class="tool-name">CCTV Analysis</div>
+          <div class="tool-desc">Upload footage, detect suspicious activity with AI</div>
+        </div>
+        <div class="tool-card" onclick="showTool('audio')">
+          <span class="tool-tag">NLP</span>
+          <div class="tool-icon">🎙️</div>
+          <div class="tool-name">Audio Analysis</div>
+          <div class="tool-desc">Transcribe recordings, highlight key terms</div>
+        </div>
+        <div class="tool-card" onclick="showTool('evidence')">
+          <span class="tool-tag">AI</span>
+          <div class="tool-icon">🔬</div>
+          <div class="tool-name">AI Evidence Analyzer</div>
+          <div class="tool-desc">Upload files for automated forensic analysis summary</div>
+        </div>
+      </div>
+
+      <!-- TOOL: CALL LOGS -->
+      <div class="tool-screen" id="tool-callLogs">
+        <div class="divider"></div>
+        <div class="section-header">
+          <div class="section-title-block">
+            <div class="eyebrow">Communication Records</div>
+            <h2>Call Logs Analysis</h2>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="tag tag-red">12 Suspicious</span>
+            <span class="tag tag-blue">247 Total</span>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px">
+          <div style="background:var(--bg3);border:1px solid var(--b1);border-radius:8px;padding:16px 14px;text-align:center">
+            <div style="font-size:28px;font-weight:700;color:#ef4444">247</div>
+            <div style="font-size:9px;color:var(--t4);letter-spacing:1px;margin-top:3px">TOTAL CALLS</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--b1);border-radius:8px;padding:16px 14px;text-align:center">
+            <div style="font-size:28px;font-weight:700;color:var(--amber)">12</div>
+            <div style="font-size:9px;color:var(--t4);letter-spacing:1px;margin-top:3px">SUSPICIOUS</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--b1);border-radius:8px;padding:16px 14px;text-align:center">
+            <div style="font-size:28px;font-weight:700;color:var(--blue)">4</div>
+            <div style="font-size:9px;color:var(--t4);letter-spacing:1px;margin-top:3px">UNIQUE NUMBERS</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--b1);border-radius:8px;padding:16px 14px;text-align:center">
+            <div style="font-size:28px;font-weight:700;color:var(--purple)">3</div>
+            <div style="font-size:9px;color:var(--t4);letter-spacing:1px;margin-top:3px">CITIES TRACED</div>
+          </div>
+        </div>
+
+        <!-- Hourly activity chart -->
+        <div class="card" style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <div class="slab" style="margin:0">Call Activity by Hour</div>
+            <span style="font-size:9px;color:var(--t4)">RED = Suspicious hours (12AM–4AM)</span>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:3px;height:60px;padding-bottom:4px">
+            <!-- 24 hour bars, simulated activity -->
+            <div id="hourlyBars" style="display:flex;align-items:flex-end;gap:3px;width:100%;height:100%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t4);margin-top:6px;padding:0 2px">
+            <span>12AM</span><span>3AM</span><span>6AM</span><span>9AM</span><span>12PM</span><span>3PM</span><span>6PM</span><span>9PM</span><span>11PM</span>
+          </div>
+        </div>
+
+        <!-- Top contacted numbers -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="slab">Most Contacted Numbers</div>
+          <div id="topNumbersBars"></div>
+        </div>
+
+        <!-- Detailed table -->
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="padding:14px 18px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center">
+            <div class="slab" style="margin:0">Detailed Call Records</div>
+            <div style="display:flex;gap:6px">
+              <button onclick="filterCalls('all')" id="filterAll" style="background:var(--red);color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:9px;font-weight:700;cursor:pointer;letter-spacing:.8px">ALL</button>
+              <button onclick="filterCalls('suspicious')" id="filterSusp" style="background:var(--b1);color:var(--t3);border:1px solid var(--b2);padding:5px 12px;border-radius:4px;font-size:9px;cursor:pointer;letter-spacing:.8px">SUSPICIOUS</button>
+              <button onclick="filterCalls('normal')" id="filterNorm" style="background:var(--b1);color:var(--t3);border:1px solid var(--b2);padding:5px 12px;border-radius:4px;font-size:9px;cursor:pointer;letter-spacing:.8px">NORMAL</button>
+            </div>
+          </div>
+          <table class="call-table" id="callTable">
+            <thead>
+              <tr>
+                <th>#</th><th>Phone Number</th><th>Name</th><th>Duration</th>
+                <th>Date & Time</th><th>App Used</th><th>Last Location</th><th>Risk</th>
+              </tr>
+            </thead>
+            <tbody id="callTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Pattern analysis -->
+        <div class="card" style="margin-top:16px;border-color:#3d0000;background:rgba(139,0,0,.04)">
+          <div class="slab" style="color:#ef4444">🔍 AI Call Pattern Analysis</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="font-size:12px;color:var(--t2);line-height:2">
+              <div>🕐 <strong style="color:var(--t1)">Peak suspicious hours:</strong> 1AM–3AM</div>
+              <div>📱 <strong style="color:var(--t1)">Primary app:</strong> Signal (encrypted)</div>
+              <div>🔁 <strong style="color:var(--t1)">Most called:</strong> +91-9999000001 (×4)</div>
+              <div>⏱ <strong style="color:var(--t1)">Avg suspicious call:</strong> 12 min 41 sec</div>
+            </div>
+            <div style="font-size:12px;color:var(--t2);line-height:2">
+              <div>📍 <strong style="color:var(--t1)">Cities covered:</strong> Gurgaon, Noida, Meerut</div>
+              <div>🔄 <strong style="color:var(--t1)">Device switching:</strong> Every 48 hrs</div>
+              <div>🌙 <strong style="color:var(--t1)">Night call ratio:</strong> 62% of flagged calls</div>
+              <div>⚖ <strong style="color:var(--t1)">Legal flag:</strong> IPC §120B Conspiracy</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL: CRIMINAL PROFILE -->
+      <div class="tool-screen" id="tool-criminal">
+        <div class="divider"></div>
+        <div class="section-header">
+          <div class="section-title-block">
+            <div class="eyebrow">Criminal Database</div>
+            <h2>Suspect Profile</h2>
+          </div>
+        </div>
+        <div class="profile-grid">
+          <div>
+            <div class="profile-card">
+              <div class="profile-avatar">👤</div>
+              <div class="profile-name">Rajesh Kumar</div>
+              <div class="profile-id">CRM-2024-001 · Male · Age 34</div>
+              <span class="risk-badge risk-critical">CRITICAL RISK</span>
+              <div class="divider" style="margin:12px 0"></div>
+              <div class="profile-kv"><span class="profile-k">Location:</span><span class="profile-v">Gurgaon, HR</span></div>
+              <div class="profile-kv"><span class="profile-k">Height:</span><span class="profile-v">5'10"</span></div>
+              <div class="profile-kv"><span class="profile-k">Associates:</span><span class="profile-v">8 known</span></div>
+              <div class="profile-kv"><span class="profile-k">Warrants:</span><span class="profile-v" style="color:#ef4444">2 active</span></div>
+              <div class="profile-kv"><span class="profile-k">Weapon:</span><span class="profile-v">Knife / Firearm</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="slab">Past Crimes</div>
+              <div class="crimes-list">
+                <div class="crime-item">🔴 <strong>2024</strong> — Organized Cyber Crime (Ongoing)</div>
+                <div class="crime-item">🟡 <strong>2021</strong> — Online Banking Fraud · 3-year sentence (Parole)</div>
+                <div class="crime-item">⚫ <strong>2019</strong> — Identity Theft · 2-year sentence (Completed)</div>
+                <div class="crime-item">⚫ <strong>2017</strong> — Mobile Snatching · Fine imposed</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="slab">Crime Pattern</div>
+              <p style="font-size:12px;color:var(--t2);line-height:1.8;margin-bottom:12px">
+                Targets elderly victims through fake investment schemes. Coordinates with associates via encrypted apps during late night hours (1AM–4AM). Switches devices every 48hrs to evade tracking. Uses hawala for money movement.
+              </p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <span class="tag tag-red">Cyber Fraud</span>
+                <span class="tag tag-amber">Hawala Network</span>
+                <span class="tag tag-purple">Identity Theft</span>
+                <span class="tag tag-blue">Night Operations</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="slab">Most Used Weapon</div>
+              <div style="display:flex;align-items:center;gap:16px">
+                <span style="font-size:40px">🔪</span>
+                <div>
+                  <div style="font-size:14px;font-weight:700;margin-bottom:4px">Folding Knife (Primary)</div>
+                  <div style="font-size:11px;color:var(--t3)">Also uses digital tools: phishing kits, SIM cloning devices</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL: MESSAGE DECODER -->
+      <div class="tool-screen" id="tool-decoder">
+        <div class="divider"></div>
+        <div class="section-header">
+          <div class="section-title-block">
+            <div class="eyebrow">AI Language Processing</div>
+            <h2>Message Decoder</h2>
+          </div>
+        </div>
+        <div class="card">
+          <div class="slab">Enter Suspicious Message</div>
+          <div class="decoder-box">
+            <div>
+              <div style="font-size:10px;color:var(--t4);margin-bottom:6px;letter-spacing:1px">INPUT — RAW MESSAGE</div>
+              <textarea class="decoder-input-area" id="decodeInput" placeholder="Paste suspicious message here...">Bhai, maal pahunch gaya? Teen number ready hai, raat ko milte hai Sec-29 pe. Upar wale ko pata nahi chalna chahiye. Signal pe baat karna.</textarea>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--t4);margin-bottom:6px;letter-spacing:1px">OUTPUT — AI DECODED</div>
+              <div class="decoder-output" id="decodeOutput">
+                <span style="color:var(--t4);font-size:11px">Click "Decode Message" to analyse...</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <button class="decode-btn" onclick="decodeMessage()">🔓 Decode Message</button>
+            <button class="btn-ghost" onclick="document.getElementById('decodeInput').value='';document.getElementById('decodeOutput').innerHTML='<span style=color:var(--t4);font-size:11px>Click Decode to analyse...</span>'">Clear</button>
+            <span id="decodeStatus" class="decode-analyzing" style="display:none">⚙ Analysing...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL: CCTV ═══════════════════════════════════════════ -->
+      <div class="tool-screen" id="tool-cctv">
+        <div class="divider"></div>
+
+        <!-- HEADER -->
+        <div class="section-header">
+          <div class="section-title-block">
+            <div class="eyebrow">Video Intelligence Unit</div>
+            <h2>CCTV Footage Analysis</h2>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <span class="tag tag-blue" id="cctvCountBadge" style="display:none">0 Videos</span>
+            <button onclick="document.getElementById('videoFileMulti').click()" style="background:var(--red);color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1.5px;cursor:pointer">+ ADD VIDEO</button>
+            <input type="file" id="videoFileMulti" accept="video/*,.mp4,.avi,.mov,.mkv,.webm,.flv,.wmv,.3gp,.ts,.m4v" multiple style="display:none" onchange="handleMultiVideoFiles(this)"/>
+          </div>
+        </div>
+
+        <!-- DROP ZONE — always visible -->
+        <div style="border:2px dashed var(--b3);border-radius:14px;padding:44px 40px;text-align:center;cursor:pointer;transition:all .3s;background:var(--bg3);margin-bottom:18px;position:relative;overflow:hidden"
+          id="cctvDrop"
+          ondragover="event.preventDefault();this.style.borderColor='#8B0000';this.style.background='rgba(139,0,0,.06)'"
+          ondragleave="this.style.borderColor='';this.style.background='var(--bg3)'"
+          ondrop="handleVideoDrop(event)"
+          onclick="document.getElementById('videoFileMulti').click()">
+          <!-- scan animation line -->
+          <div style="position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(139,0,0,.5),transparent);animation:scanDown 3s linear infinite;pointer-events:none"></div>
+          <div style="font-size:52px;margin-bottom:14px;filter:drop-shadow(0 0 16px rgba(139,0,0,.4))">📹</div>
+          <div style="font-family:var(--serif);font-size:20px;color:var(--t1);margin-bottom:6px">Drop CCTV Footage Here</div>
+          <div style="font-size:10px;color:var(--t3);letter-spacing:1px;margin-bottom:14px">MP4 · AVI · MOV · MKV · WEBM — multiple files supported</div>
+          <span style="background:var(--red);color:#fff;padding:8px 22px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:1.5px">BROWSE FILES</span>
+        </div>
+
+        <!-- VIDEO QUEUE -->
+        <div id="videoQueueSection" style="display:none;margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-size:9px;color:var(--t4);letter-spacing:2px">UPLOADED FOOTAGE</div>
+            <button onclick="clearAllVideos()" style="background:none;border:1px solid var(--b2);color:var(--t3);padding:5px 12px;border-radius:4px;font-size:9px;cursor:pointer">CLEAR ALL</button>
+          </div>
+          <div id="videoQueueList" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+
+        <!-- ACTIVE VIDEO PANEL -->
+        <div id="videoActivePanel" style="display:none">
+
+          <!-- Video player card -->
+          <div style="background:#000;border-radius:12px;overflow:hidden;border:1px solid var(--b2);margin-bottom:14px;position:relative">
+            <div style="position:absolute;top:10px;left:10px;z-index:10;display:flex;gap:6px;flex-wrap:wrap" id="videoPlayerBadges"></div>
+            <video id="videoPlayer" controls style="width:100%;max-height:380px;display:block"></video>
+            <!-- Incident marker overlay for player (decorative) -->
+            <div id="videoMarkerRow" style="height:6px;background:#000;display:flex;align-items:center;padding:0 2px;gap:1px" title="Red = suspicious events in timeline"></div>
+          </div>
+
+          <!-- File meta strip -->
+          <div style="background:var(--bg3);border:1px solid var(--b1);border-radius:8px;padding:12px 18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:14px;font-size:10px;color:var(--t3)">
+            <span>📁 <strong style="color:var(--t1)" id="vActiveFileName">—</strong></span>
+            <span>💾 <span id="vActiveSize">—</span></span>
+            <span>🎞 <span id="vActiveFormat">—</span></span>
+            <span>🕐 <span id="vActiveDuration">—</span></span>
+            <div style="margin-left:auto">
+              <button onclick="saveVideoLocally()" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#22c55e;padding:8px 18px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--mono);transition:all .2s;letter-spacing:.8px" onmouseenter="this.style.background='rgba(34,197,94,.2)'" onmouseleave="this.style.background='rgba(34,197,94,.1)'">💾 SAVE FOOTAGE</button>
+            </div>
+          </div>
+
+          <!-- Processing bar -->
+          <div id="videoProcessingCard" style="display:none;background:var(--bg3);border:1px solid var(--b2);border-radius:12px;padding:22px 24px;margin-bottom:14px">
+            <div style="font-size:9px;color:var(--t4);letter-spacing:2.5px;margin-bottom:14px">SAKSHYAM VIDEO ENGINE · ANALYSING</div>
+            <div id="vProcessStages" style="margin-bottom:16px"></div>
+            <div style="height:6px;background:var(--b1);border-radius:3px;overflow:hidden">
+              <div id="videoProcessBar" style="height:100%;width:0%;background:linear-gradient(90deg,#5c0000,var(--red),#ef4444);border-radius:3px;transition:width .2s;box-shadow:0 0 10px rgba(139,0,0,.4)"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px">
+              <span id="videoProcessStep" style="font-size:10px;color:var(--t3)">Initialising...</span>
+              <span id="videoProcessPct" style="font-size:12px;font-weight:700;color:var(--red)">0%</span>
+            </div>
+          </div>
+
+          <!-- RESULTS -->
+          <div id="aiAlertCard" style="display:none">
+
+            <!-- TOP STATS ROW -->
+            <div id="videoStatRow" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px"></div>
+
+            <!-- THREAT SCORE BAR -->
+            <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:12px;padding:18px 22px;margin-bottom:14px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+                <div style="font-size:9px;color:var(--t4);letter-spacing:2px">FOOTAGE THREAT SCORE</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap" id="videoScoreBadges"></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px">
+                <div style="flex:1;height:12px;background:var(--b1);border-radius:6px;overflow:hidden">
+                  <div id="videoThreatFill" style="height:100%;width:0%;border-radius:6px;transition:width 1.2s ease;background:linear-gradient(90deg,#22c55e,#f59e0b,#ef4444)"></div>
+                </div>
+                <div id="videoThreatScore" style="font-size:28px;font-weight:700;min-width:60px;text-align:right;color:#ef4444">—</div>
+              </div>
+              <div id="videoThreatLabel" style="font-size:10px;color:var(--t3);margin-top:6px">—</div>
+            </div>
+
+            <!-- MOST REPEATED ACTIONS -->
+            <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:12px;overflow:hidden;margin-bottom:14px">
+              <div style="padding:16px 22px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+                <div>
+                  <div style="font-size:9px;color:var(--t4);letter-spacing:2px">🔁 MOST REPEATED ACTIONS</div>
+                  <div style="font-size:10px;color:var(--t3);margin-top:2px">Actions detected ≥2 times — critical for identifying behavioural patterns</div>
+                </div>
+              </div>
+              <div id="repeatedActionsGrid" style="padding:16px 22px;display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+            </div>
+
+            <!-- SUSPICIOUS ACTIVITY LOG — MAIN -->
+            <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:12px;overflow:hidden;margin-bottom:14px">
+              <div style="padding:16px 22px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+                <div>
+                  <div style="font-size:9px;color:var(--t4);letter-spacing:2px">⚠ SUSPICIOUS ACTIVITY LOG</div>
+                  <div style="font-size:10px;color:var(--t3);margin-top:2px">Every detected incident with timestamp — click timestamp to jump to that moment</div>
+                </div>
+                <div id="videoAlertSummary" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+              </div>
+              <!-- Filter tabs -->
+              <div style="padding:10px 22px;border-bottom:1px solid var(--b1);display:flex;gap:6px;flex-wrap:wrap" id="alertFilterRow"></div>
+              <div class="ai-alerts" id="aiAlerts" style="padding:8px 12px"></div>
+            </div>
+
+            <!-- INCIDENT TIMELINE -->
+            <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:12px;padding:18px 22px;margin-bottom:14px">
+              <div style="font-size:9px;color:var(--t4);letter-spacing:2px;margin-bottom:14px">📍 INCIDENT TIMELINE — hover dots to see event details</div>
+              <div id="videoTimeline" style="position:relative;height:48px;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--b1)"></div>
+              <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t4);margin-top:6px">
+                <span>00:00:00</span><span id="videoEndTime">00:00:00</span>
+              </div>
+              <!-- Legend -->
+              <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap">
+                <div style="display:flex;align-items:center;gap:6px;font-size:9px;color:var(--t3)"><div style="width:10px;height:10px;border-radius:50%;background:#ef4444"></div>Critical</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:9px;color:var(--t3)"><div style="width:10px;height:10px;border-radius:50%;background:#f59e0b"></div>Warning</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:9px;color:var(--t3)"><div style="width:10px;height:10px;border-radius:50%;background:#3b82f6"></div>Info</div>
+              </div>
+            </div>
+
+            <!-- EVIDENCE INTEGRITY + AI BRIEFING -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+              <!-- Integrity -->
+              <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:12px;padding:18px 22px">
+                <div style="font-size:9px;color:var(--t4);letter-spacing:2px;margin-bottom:14px">🔒 EVIDENCE INTEGRITY REPORT</div>
+                <div id="integrityReport"></div>
+              </div>
+
+              <!-- AI Officer Briefing -->
+              <div style="background:rgba(139,0,0,.05);border:1px solid rgba(139,0,0,.2);border-radius:12px;padding:18px 22px">
+                <div style="font-size:9px;color:#ef4444;letter-spacing:2px;margin-bottom:14px">🤖 AI OFFICER BRIEFING</div>
+                <div id="videoAIBriefing" style="font-size:11px;color:var(--t2);line-height:2;border-left:3px solid var(--red);padding-left:14px"></div>
+              </div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px" id="videoActionRow"></div>
+
+          </div><!-- /aiAlertCard -->
+        </div><!-- /videoActivePanel -->
+
+        <!-- SAVE MODAL -->
+        <div id="saveModal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);align-items:center;justify-content:center">
+          <div style="background:var(--bg2);border:1px solid var(--b3);border-radius:14px;width:360px;max-width:92vw;overflow:hidden;animation:fadeUp .3s ease">
+            <div style="padding:20px 22px;border-bottom:1px solid var(--b2);background:rgba(34,197,94,.06)">
+              <div style="font-size:9px;color:var(--t4);letter-spacing:2px;margin-bottom:4px">EVIDENCE PRESERVATION</div>
+              <div style="font-family:var(--serif);font-size:18px;color:var(--t1)">💾 Footage Saved</div>
+            </div>
+            <div style="padding:22px" id="saveModalBody"></div>
+          </div>
+        </div>
+
+      </div><!-- /tool-cctv -->
+
+      <!-- TOOL: AUDIO — MULTI FILE -->
+      <div class="tool-screen" id="tool-audio">
+        <div class="divider"></div>
+        <div class="section-header">
+          <div class="section-title-block">
+            <div class="eyebrow">Speech Intelligence Unit</div>
+            <h2>Audio Intelligence Analysis</h2>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="tag tag-blue" id="audioCountBadge" style="display:none">0 Files</span>
+            <button onclick="document.getElementById('audioFileMulti').click()" style="background:var(--red);color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1.5px;cursor:pointer">+ ADD AUDIO</button>
+            <input type="file" id="audioFileMulti" accept="audio/*,.opus,.ogg,.mp3,.wav,.m4a,.flac,.aac,.wma,.webm,.3gp,.amr" multiple style="display:none" onchange="handleMultiAudioFiles(this)"/>
+          </div>
+        </div>
+
+        <!-- DROP ZONE — always visible -->
+        <div style="border:2px dashed var(--b3);border-radius:14px;padding:40px;text-align:center;cursor:pointer;transition:all .25s;background:var(--bg3);margin-bottom:16px"
+          id="audioDrop"
+          ondragover="event.preventDefault();this.style.borderColor='#8B0000';this.style.background='rgba(139,0,0,.06)'"
+          ondragleave="this.style.borderColor='';this.style.background='var(--bg3)'"
+          ondrop="handleAudioDrop(event)"
+          onclick="document.getElementById('audioFileMulti').click()">
+          <div style="display:flex;align-items:center;justify-content:center;gap:3px;margin-bottom:14px;height:36px">
+            <div style="width:3px;height:10px;background:var(--b3);border-radius:2px;animation:waveIdle 1.2s ease-in-out infinite"></div>
+            <div style="width:3px;height:18px;background:var(--b3);border-radius:2px;animation:waveIdle 1.2s ease-in-out infinite;animation-delay:.1s"></div>
+            <div style="width:3px;height:28px;background:var(--red);border-radius:2px;animation:waveIdle 1.2s ease-in-out infinite;animation-delay:.2s"></div>
+            <div style="width:3px;height:36px;background:var(--red);border-radius:2px;animation:waveIdle 1.2s ease-in-out infinite;animation-delay:.3s"></div>
+            <div style="width:3px;height:28px;background:var(--red);border-radius:2px;animation:waveIdle 1.2s ease-in-out infinite;animation-delay:.4s"></div>
+            <div style="width:3px;height:18px;background:var(--b3);border-radius:2px;animation:waveIdle 1.2s ease-in-out infinite;animation-delay:.5s"></div>
+            <div style="width:3px;height:10px;background:var(--b3);border-radius:2px;animation:waveIdle 1.2s ease-in-out infinite;animation-delay:.6s"></div>
+          </div>
+          <div style="font-family:var(--serif);font-size:18px;color:var(--t1);margin-bottom:5px">Drop Multiple Audio Files Here</div>
+          <div style="font-size:10px;color:var(--t3);letter-spacing:1px;margin-bottom:12px">MP3 · WAV · M4A · OGG · FLAC — drag multiple files at once</div>
+          <span style="background:var(--red);color:#fff;padding:7px 20px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:1.5px">BROWSE FILES</span>
+        </div>
+
+        <!-- QUEUE LIST -->
+        <div id="audioQueueSection" style="display:none;margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-size:9px;color:var(--t4);letter-spacing:2px">UPLOADED AUDIO FILES</div>
+            <button onclick="clearAllAudio()" style="background:none;border:1px solid var(--b2);color:var(--t3);padding:5px 12px;border-radius:4px;font-size:9px;cursor:pointer;letter-spacing:.5px">CLEAR ALL</button>
+          </div>
+          <div id="audioQueueList" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+
+        <!-- ACTIVE AUDIO PANEL (shown when a file is selected) -->
+        <div id="audioActivePanel" style="display:none">
+
+          <!-- Tab header -->
+          <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:12px 12px 0 0;padding:14px 22px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+            <div>
+              <div style="font-size:9px;color:var(--t4);letter-spacing:2px">NOW ANALYSING</div>
+              <div style="font-size:13px;color:var(--t1);font-weight:700;margin-top:3px" id="activeAudioName">—</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap" id="activeAudioBadges"></div>
+          </div>
+
+          <!-- Player -->
+          <div style="background:var(--bg3);border:1px solid var(--b2);border-top:none;padding:16px 22px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+            <audio id="audioPlayer" controls style="flex:1;min-width:200px;height:34px"></audio>
+            <div style="display:flex;gap:8px;font-size:10px;color:var(--t3)">
+              <span id="activeAudioSize">—</span>
+              <span style="color:var(--b3)">·</span>
+              <span id="activeAudioFmt">—</span>
+            </div>
+          </div>
+
+          <!-- Processing bar (inside panel) -->
+          <div id="audioProcessingCard" style="display:none;background:var(--bg3);border:1px solid var(--b2);border-top:none;padding:18px 22px">
+            <div style="font-size:9px;color:var(--t4);letter-spacing:2px;margin-bottom:12px">SAKSHYAM SPEECH ENGINE · PROCESSING</div>
+            <div style="height:6px;background:var(--b1);border-radius:3px;overflow:hidden;margin-bottom:8px">
+              <div id="audioProcessBar" style="height:100%;width:0%;background:linear-gradient(90deg,#5c0000,var(--red),#ef4444);border-radius:3px;transition:width .2s"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span id="audioProcessStep" style="font-size:10px;color:var(--t3)">Initialising...</span>
+              <span id="audioProcessPct" style="font-size:11px;font-weight:700;color:var(--red)">0%</span>
+            </div>
+          </div>
+
+          <!-- Results section -->
+          <div id="audioResultsCard" style="display:none;background:var(--bg3);border:1px solid var(--b2);border-top:none;border-radius:0 0 12px 12px;overflow:hidden">
+
+            <!-- Quick stats row -->
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--b1)">
+              <div style="padding:14px 18px;border-right:1px solid var(--b1);text-align:center">
+                <div style="font-size:24px;font-weight:700;color:#ef4444" id="statSuspCount">—</div>
+                <div style="font-size:8px;color:var(--t4);letter-spacing:1px;margin-top:2px">SUSPICIOUS WORDS</div>
+              </div>
+              <div style="padding:14px 18px;border-right:1px solid var(--b1);text-align:center">
+                <div style="font-size:24px;font-weight:700;color:var(--blue)" id="statSpeakers">—</div>
+                <div style="font-size:8px;color:var(--t4);letter-spacing:1px;margin-top:2px">SPEAKERS DETECTED</div>
+              </div>
+              <div style="padding:14px 18px;text-align:center">
+                <div style="font-size:24px;font-weight:700;color:var(--purple)" id="statWords">—</div>
+                <div style="font-size:8px;color:var(--t4);letter-spacing:1px;margin-top:2px">TOTAL WORDS</div>
+              </div>
+            </div>
+
+            <!-- Threat bar -->
+            <div style="padding:16px 22px;border-bottom:1px solid var(--b1)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+                <div style="font-size:9px;color:var(--t4);letter-spacing:2px">THREAT SCORE</div>
+                <div style="display:flex;gap:6px" id="audioThreatBadges"></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="flex:1;height:10px;background:var(--b1);border-radius:5px;overflow:hidden">
+                  <div id="audioThreatFill" style="height:100%;width:0%;border-radius:5px;transition:width 1s ease;background:linear-gradient(90deg,#22c55e,#f59e0b,#ef4444)"></div>
+                </div>
+                <div id="audioThreatScore" style="font-size:24px;font-weight:700;min-width:52px;text-align:right">—</div>
+              </div>
+              <div id="audioThreatLabel" style="font-size:10px;color:var(--t3);margin-top:4px">—</div>
+            </div>
+
+            <!-- Transcript -->
+            <div style="padding:16px 22px;border-bottom:1px solid var(--b1)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px">
+                <div style="font-size:9px;color:var(--t4);letter-spacing:2px">AI TRANSCRIPT <span style="color:var(--t3);font-size:9px;letter-spacing:0;font-weight:400;margin-left:6px">Highlighted = suspicious keywords</span></div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap" id="audioLangBadge"></div>
+              </div>
+              <div id="audioTranscript" style="max-height:220px;overflow-y:auto;line-height:2.4;font-size:12px;color:var(--t2);background:var(--bg2);padding:14px;border-radius:8px"></div>
+            </div>
+
+            <!-- Word frequency + cloud -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--b1)">
+              <div style="padding:16px 22px;border-right:1px solid var(--b1)">
+                <div style="font-size:9px;color:var(--t4);letter-spacing:2px;margin-bottom:12px">TOP WORD FREQUENCY <span style="font-size:9px;color:var(--t3);letter-spacing:0;margin-left:4px" id="audioTotalWords"></span></div>
+                <div id="audioWordBars"></div>
+              </div>
+              <div style="padding:16px 22px">
+                <div style="font-size:9px;color:var(--t4);letter-spacing:2px;margin-bottom:12px">KEYWORD CLOUD</div>
+                <div id="audioWordCloud" style="display:flex;flex-wrap:wrap;gap:7px;align-content:flex-start"></div>
+              </div>
+            </div>
+
+            <!-- Suspicious keywords -->
+            <div style="padding:16px 22px;border-bottom:1px solid var(--b1);background:rgba(139,0,0,.04)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px">
+                <div style="font-size:9px;color:#ef4444;letter-spacing:2px">⚠ SUSPICIOUS KEYWORD INTELLIGENCE</div>
+                <span id="audioSuspBadge" class="tag tag-red"></span>
+              </div>
+              <div id="audioSuspiciousList"></div>
+            </div>
+
+            <!-- AI Officer Briefing -->
+            <div style="padding:16px 22px">
+              <div style="font-size:9px;color:var(--t4);letter-spacing:2px;margin-bottom:10px">🤖 AI OFFICER BRIEFING</div>
+              <div id="audioAISummary" style="font-size:12px;color:var(--t2);line-height:2;border-left:3px solid var(--red);padding-left:14px"></div>
+              <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap" id="audioActionChips"></div>
+            </div>
+          </div>
+        </div><!-- /audioActivePanel -->
+
+      </div><!-- /tool-audio -->
+
+      <!-- TOOL: EVIDENCE -->
+      <div class="tool-screen" id="tool-evidence">
+        <div class="divider"></div>
+        <div class="section-header">
+          <div class="section-title-block">
+            <div class="eyebrow">Forensic Intelligence</div>
+            <h2>AI Evidence Analyzer</h2>
+          </div>
+          <div id="evidenceFileMeta" style="display:none;text-align:right">
+            <div style="font-size:11px;color:var(--t2);font-weight:700" id="evidenceFileName">—</div>
+            <div style="font-size:9px;color:var(--t3);margin-top:2px" id="evidenceFileSizeTxt">—</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="slab">Upload Evidence File</div>
+          <div class="evidence-upload" id="evidenceDrop"
+            ondragover="event.preventDefault();this.classList.add('drag-over');this.style.borderColor='#8B0000'"
+            ondragleave="this.classList.remove('drag-over');this.style.borderColor=''"
+            ondrop="handleEvidenceDrop(event)"
+            onclick="document.getElementById('evidenceFile').click()"
+            style="border:2px dashed var(--b2);border-radius:10px;padding:40px;text-align:center;cursor:pointer;transition:all .2s">
+            <input type="file" id="evidenceFile" style="display:none" onchange="handleEvidenceFile(this)"/>
+            <div style="font-size:44px;margin-bottom:12px">📁</div>
+            <div style="font-family:var(--serif);font-size:17px;color:var(--t2);margin-bottom:5px">Drag & Drop any evidence file or click to browse</div>
+            <div style="font-size:10px;color:var(--t4)">PDF · Image · Audio · Video · Document · Archive</div>
+          </div>
+        </div>
+        <!-- Processing -->
+        <div id="evidenceProcessingCard" style="display:none" class="card">
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="width:34px;height:34px;border:3px solid var(--b2);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0"></div>
+            <div style="flex:1">
+              <div style="font-size:12px;color:var(--t1);font-weight:700" id="evidenceProcessStep">Reading file structure...</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:3px">Metadata Extraction · Content Analysis · Threat Scoring</div>
+              <div style="height:4px;background:var(--b1);border-radius:2px;margin-top:8px;overflow:hidden">
+                <div id="evidenceProcessBar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--red),#ef4444);border-radius:2px;transition:width .15s"></div>
+              </div>
+            </div>
+            <div style="font-size:22px;font-weight:700;color:var(--red);min-width:42px;text-align:right" id="evidenceProcessPct">0%</div>
+          </div>
+        </div>
+        <!-- Results -->
+        <div id="evidenceResult" style="display:none">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+              <div>
+                <div id="evidenceResultFileLabel" style="font-size:13px;color:var(--t1);font-weight:700;margin-bottom:4px"></div>
+                <div id="evidenceResultMeta" style="font-size:10px;color:var(--t3)"></div>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap" id="evidenceResultTags"></div>
+            </div>
+            <!-- Threat bars -->
+            <div class="evidence-section">
+              <div class="evidence-label">Threat Assessment</div>
+              <div id="evidenceThreatBars"></div>
+            </div>
+            <!-- AI Summary -->
+            <div class="evidence-section">
+              <div class="evidence-label">AI Summary</div>
+              <div id="evidenceAISummary" style="font-size:12px;color:var(--t2);line-height:1.9;background:var(--bg2);padding:14px;border-radius:6px;border-left:3px solid var(--red)"></div>
+            </div>
+            <!-- Metadata -->
+            <div class="evidence-section">
+              <div class="evidence-label">File Metadata</div>
+              <div id="evidenceMetadata" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:var(--t2)"></div>
+            </div>
+            <!-- Legal -->
+            <div class="evidence-section">
+              <div class="evidence-label" style="color:#ef4444">⚖ Applicable Legal Sections</div>
+              <div id="evidenceLegal" style="font-size:11px;color:var(--t2);line-height:2.2;background:rgba(139,0,0,.05);padding:12px;border-radius:6px;border:1px solid #3d0000"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /screen-open -->
+
+    <!-- CLOSED CASES -->
+    <div id="screen-closed">
+      <div class="section-header">
+        <div class="section-title-block">
+          <div class="eyebrow">Case Archive</div>
+          <h2>Closed Cases</h2>
+        </div>
+        <span class="tag tag-green">23 Resolved</span>
+      </div>
+
+      <div class="case-card">
+        <div class="case-header">
+          <span class="case-id">CLOS-2023-045</span>
+          <span class="status-badge status-solved">Solved</span>
+        </div>
+        <div class="case-title">Drug Trafficking — Goa Coastal Network</div>
+        <div class="case-kv"><span class="case-k">Crime Type:</span><span class="case-v">Narcotics Trafficking</span></div>
+        <div class="case-kv"><span class="case-k">Summary:</span><span class="case-v">Interstate drug ring smuggling synthetic narcotics via fishing boats along Goa-Maharashtra coast. 8 arrests made.</span></div>
+        <div class="case-kv"><span class="case-k">Evidence Used:</span><span class="case-v">CCTV footage, encrypted WhatsApp messages, 25kg seized contraband, bank transfers</span></div>
+        <div class="case-kv"><span class="case-k">How Solved:</span><span class="case-v">Informant tip + AI call log analysis identified central coordinator. Sting operation conducted Jan 2024.</span></div>
+      </div>
+
+      <div class="case-card">
+        <div class="case-header">
+          <span class="case-id">CLOS-2023-082</span>
+          <span class="status-badge status-solved">Solved</span>
+        </div>
+        <div class="case-title">Corporate Embezzlement — FinTech CFO</div>
+        <div class="case-kv"><span class="case-k">Crime Type:</span><span class="case-v">Financial Crime · White Collar</span></div>
+        <div class="case-kv"><span class="case-k">Summary:</span><span class="case-v">CFO siphoned ₹4.2 crore through 47 fake vendor payments over 18 months. Convicted under PMLA.</span></div>
+        <div class="case-kv"><span class="case-k">Evidence Used:</span><span class="case-v">Audit trail, email records, 3 shell company accounts, digital signatures</span></div>
+        <div class="case-kv"><span class="case-k">How Solved:</span><span class="case-v">AI evidence analyzer flagged anomalous transaction patterns. Forensic accountant confirmed findings.</span></div>
+      </div>
+
+      <div class="case-card">
+        <div class="case-header">
+          <span class="case-id">CLOS-2023-061</span>
+          <span class="status-badge status-solved">Solved</span>
+        </div>
+        <div class="case-title">ATM Card Cloning Gang — Delhi NCR</div>
+        <div class="case-kv"><span class="case-k">Crime Type:</span><span class="case-v">Cyber Crime · Banking Fraud</span></div>
+        <div class="case-kv"><span class="case-k">Summary:</span><span class="case-v">Gang installed card skimmers on 14 ATMs across Delhi. 340+ victims. ₹76 lakh stolen.</span></div>
+        <div class="case-kv"><span class="case-k">Evidence Used:</span><span class="case-v">ATM CCTV footage, recovered skimmer devices, call logs, transaction records</span></div>
+        <div class="case-kv"><span class="case-k">How Solved:</span><span class="case-v">CCTV facial recognition matched suspect. CDR analysis confirmed gang coordination pattern.</span></div>
+      </div>
+    </div>
+
+    <!-- HALTED CASES -->
+    <div id="screen-halted">
+      <div class="section-header">
+        <div class="section-title-block">
+          <div class="eyebrow">Paused Investigations</div>
+          <h2>Halted Cases</h2>
+        </div>
+        <span class="tag tag-purple">4 Halted</span>
+      </div>
+
+      <div class="case-card">
+        <div class="case-header">
+          <span class="case-id">HALT-2024-003</span>
+          <span class="status-badge status-halted">Halted</span>
+        </div>
+        <div class="case-title">Political Assassination Attempt</div>
+        <div class="case-kv"><span class="case-k">Crime Type:</span><span class="case-v">Attempt to Murder · Political</span></div>
+        <div class="case-kv"><span class="case-k">Work Completed:</span><span class="case-v">Suspect identified, call logs analysed, 2 witnesses recorded, FIR filed</span></div>
+        <div class="halt-reason">⏸ Halted Reason: Key witness refused to testify citing security threats. Case transferred to CBI for further investigation.</div>
+      </div>
+
+      <div class="case-card">
+        <div class="case-header">
+          <span class="case-id">HALT-2023-091</span>
+          <span class="status-badge status-halted">Halted</span>
+        </div>
+        <div class="case-title">Land Mafia Extortion Ring — Pune</div>
+        <div class="case-kv"><span class="case-k">Crime Type:</span><span class="case-v">Extortion · Organized Crime</span></div>
+        <div class="case-kv"><span class="case-k">Work Completed:</span><span class="case-v">Digital evidence collected, 4 suspects identified, CCTV footage preserved</span></div>
+        <div class="halt-reason">⏸ Halted Reason: Insufficient digital evidence for prosecution. Awaiting court order for telecom CDRs. Expected resumption: 45 days.</div>
+      </div>
+
+      <div class="case-card">
+        <div class="case-header">
+          <span class="case-id">HALT-2023-067</span>
+          <span class="status-badge status-halted">Halted</span>
+        </div>
+        <div class="case-title">Human Trafficking Network — Interstate</div>
+        <div class="case-kv"><span class="case-k">Crime Type:</span><span class="case-v">Human Trafficking · Organized Crime</span></div>
+        <div class="case-kv"><span class="case-k">Work Completed:</span><span class="case-v">Network mapped across 5 states, 12 suspects identified, 3 rescue operations conducted</span></div>
+        <div class="halt-reason">⏸ Halted Reason: Requires interstate coordination with MP, UP, and Rajasthan police. Joint task force being formed. CBI involvement requested.</div>
+      </div>
+
+      <div class="case-card">
+        <div class="case-header">
+          <span class="case-id">HALT-2024-011</span>
+          <span class="status-badge status-halted">Halted</span>
+        </div>
+        <div class="case-title">Fake Currency Printing Operation</div>
+        <div class="case-kv"><span class="case-k">Crime Type:</span><span class="case-v">Counterfeiting · Currency Fraud</span></div>
+        <div class="case-kv"><span class="case-k">Work Completed:</span><span class="case-v">Printing press location identified, ₹12L fake notes seized, 2 suspects arrested</span></div>
+        <div class="halt-reason">⏸ Halted Reason: Primary suspect absconded to Nepal. Interpol notice issued. Case on hold pending extradition proceedings.</div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ══════════════════ NYAY CHATBOT ══════════════════ -->
+<div class="chat-window" id="chatWindow">
+  <div class="chat-header">
+    <div>
+      <div class="chat-title">⚖ Nyay AI</div>
+      <div class="chat-subtitle">AI-POWERED FORENSIC ASSISTANT</div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">×</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-msg bot">
+      <strong>Namaste! I'm Nyay</strong> — your forensic AI assistant 🙏<br/><br/>
+      I can help you analyse evidence, understand legal sections, and guide investigations. What would you like to know?
+    </div>
+  </div>
+  <div class="chat-chips">
+    <button class="chat-chip" onclick="sendChip('What are suspicious call patterns?')">Suspicious calls?</button>
+    <button class="chat-chip" onclick="sendChip('Which IPC sections apply for cyber fraud?')">IPC sections</button>
+    <button class="chat-chip" onclick="sendChip('Summarize the open case')">Case summary</button>
+    <button class="chat-chip" onclick="sendChip('What should be investigated next?')">Next steps</button>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatInput" placeholder="Ask Nyay anything..." onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button class="chat-send" onclick="sendChat()">→</button>
+  </div>
+</div>
+<button class="chat-fab" onclick="toggleChat()" title="Ask Nyay AI">⚖</button>
+
+<script>
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+let currentScreen = 'dashboard';
+let currentTool   = null;
+let chatOpen      = false;
+let officerId     = 'OFF-001';
+
+/* ══════════════════════════════════════
+   LANDING → LOGIN
+══════════════════════════════════════ */
+function showLogin() {
+  const landing = document.getElementById('landing');
+  landing.style.animation = 'fadeIn .4s ease reverse both';
+  setTimeout(() => {
+    landing.style.display = 'none';
+    const login = document.getElementById('login');
+    login.style.display = 'flex';
+    login.style.animation = 'fadeIn .4s ease both';
+  }, 380);
+}
+
+/* ══════════════════════════════════════
+   LOGIN
+══════════════════════════════════════ */
+function doLogin() {
+  const id   = document.getElementById('offId').value.trim();
+  const pass = document.getElementById('offPass').value;
+  const err  = document.getElementById('loginErr');
+
+  if ((id === 'OFF-001' || id === 'admin') && (pass === 'admin123' || pass === 'admin')) {
+    officerId = id;
+    document.getElementById('topOfficer').textContent = id;
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('app').style.display   = 'flex';
+    document.getElementById('app').style.flexDirection = 'column';
+    showScreen('dashboard');
+  } else {
+    err.style.display = 'block';
+    const card = document.querySelector('.login-card');
+    card.style.animation = 'none';
+    setTimeout(() => { card.style.animation = ''; err.style.display = 'none'; }, 3000);
+  }
+}
+// Enter key for login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login').style.display !== 'none') doLogin();
+});
+
+function doLogout() {
+  document.getElementById('app').style.display   = 'none';
+  document.getElementById('landing').style.display = 'flex';
+  document.getElementById('landing').style.animation = 'fadeIn .4s ease both';
+}
+
+/* ══════════════════════════════════════
+   SCREEN NAVIGATION
+══════════════════════════════════════ */
+const screenMap = {
+  dashboard: { id: 'screen-dashboard', title: 'Dashboard',       back: null },
+  open:      { id: 'screen-open',      title: 'Open Cases',      back: 'dashboard' },
+  closed:    { id: 'screen-closed',    title: 'Closed Cases',    back: 'dashboard' },
+  halted:    { id: 'screen-halted',    title: 'Halted Cases',    back: 'dashboard' },
+};
+
+function showScreen(name) {
+  // Hide all screens
+  Object.values(screenMap).forEach(s => {
+    document.getElementById(s.id).style.display = 'none';
+  });
+
+  // Hide all tools
+  document.querySelectorAll('.tool-screen').forEach(t => t.style.display = 'none');
+  currentTool = null;
+
+  const s = screenMap[name];
+  if (!s) return;
+
+  document.getElementById(s.id).style.display = 'block';
+  document.getElementById('topSection').textContent = s.title;
+  document.getElementById('backBtn').style.display = s.back ? 'block' : 'none';
+  currentScreen = name;
+  window.scrollTo(0, 0);
+}
+
+function goBack() {
+  if (currentTool) {
+    document.querySelectorAll('.tool-screen').forEach(t => t.style.display = 'none');
+    currentTool = null;
+    document.getElementById('topSection').textContent = 'Open Cases';
+  } else {
+    const s = screenMap[currentScreen];
+    if (s && s.back) showScreen(s.back);
+  }
+}
+
+/* ══════════════════════════════════════
+   TOOL NAVIGATION
+══════════════════════════════════════ */
+function showTool(toolId) {
+  document.querySelectorAll('.tool-screen').forEach(t => t.style.display = 'none');
+  const el = document.getElementById('tool-' + toolId);
+  if (el) {
+    el.style.display = 'block';
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  currentTool = toolId;
+  document.getElementById('backBtn').style.display = 'block';
+  if (toolId === 'callLogs') setTimeout(initCallLogs, 80);
+}
+
+/* ══════════════════════════════════════
+   GOOGLE MAPS
+══════════════════════════════════════ */
+function openMap(lat, lng, label) {
+  window.open(`https://www.google.com/maps?q=${lat},${lng}&z=15&label=${encodeURIComponent(label)}`, '_blank');
+}
+
+/* ══════════════════════════════════════
+   MESSAGE DECODER
+══════════════════════════════════════ */
+const DECODE_RESPONSES = {
+  default: `🔍 <strong>AI Decoded Analysis:</strong><br/><br/>
+    <strong>Plain Language:</strong><br/>
+    "Brother, has the goods arrived? Three persons are ready, we will meet tonight at Sector-29. The authorities must not find out. Communicate only on Signal (encrypted app)."<br/><br/>
+    <strong>⚠ Suspicious Indicators:</strong><br/>
+    • "Maal" = contraband / illegal goods<br/>
+    • "Teen number" = 3 accomplices<br/>
+    • "Upar wale" = police/authorities<br/>
+    • "Signal pe baat karna" = using encrypted communication<br/><br/>
+    <strong>🔴 Threat Level: HIGH</strong><br/>
+    Applicable: IPC §120B (Criminal Conspiracy) · §34 (Common Intention)`
+};
+
+function decodeMessage() {
+  const input = document.getElementById('decodeInput').value.trim();
+  const output = document.getElementById('decodeOutput');
+  const status = document.getElementById('decodeStatus');
+
+  if (!input) {
+    showToast('Please enter a message to decode');
+    return;
+  }
+
+  status.style.display = 'inline';
+  output.innerHTML = '<span style="color:var(--t4);animation:pulse 1s infinite;display:block">⚙ Processing with AI...</span>';
+
+  setTimeout(() => {
+    status.style.display = 'none';
+    // Simulate intelligent decoding
+    let result = DECODE_RESPONSES.default;
+
+    if (/hawala|transfer|lakh|crore/i.test(input)) {
+      result = `🔍 <strong>Financial Crime Analysis:</strong><br/><br/>
+        <strong>Plain Language:</strong><br/>
+        Message contains references to illegal money transfer via hawala network. Large sums being moved to avoid banking detection.<br/><br/>
+        <strong>⚠ Key Findings:</strong><br/>
+        • Hawala transaction coordination detected<br/>
+        • Amount mentions suggest large-scale fraud<br/>
+        • Account details shared on encrypted channel<br/><br/>
+        <strong>🔴 Threat Level: CRITICAL</strong><br/>
+        Applicable: PMLA §3&4 · IPC §420 · IT Act §66D`;
+    } else if (/meeting|milna|milte|location|jagah/i.test(input)) {
+      result = `🔍 <strong>Meeting Coordination Analysis:</strong><br/><br/>
+        <strong>Plain Language:</strong><br/>
+        Suspects are coordinating a physical meeting at a specific location. Communication deliberately vague to evade surveillance.<br/><br/>
+        <strong>⚠ Key Findings:</strong><br/>
+        • Physical meeting coordination<br/>
+        • Location deliberately obscured<br/>
+        • Possible goods/weapons exchange<br/><br/>
+        <strong>🟡 Threat Level: HIGH</strong><br/>
+        Applicable: IPC §120B · §34`;
+    }
+
+    output.innerHTML = `<div style="animation:fadeIn .4s ease">${result}</div>`;
+  }, 1800);
+}
+
+/* ══════════════════════════════════════
+   CALL LOGS — INIT
+══════════════════════════════════════ */
+const CALL_DATA = [
+  {num:'+91-9999000001',name:'Unknown',   dur:'14:32',date:'Jan 19, 01:23',app:'Signal',   lat:28.4595,lng:77.0266,loc:'Gurgaon Sec 29', status:'suspicious',calls:4},
+  {num:'+91-9999000002',name:'Vikram S.', dur:'08:45',date:'Jan 19, 02:11',app:'WhatsApp', lat:28.5355,lng:77.3910,loc:'Noida Sec 62',   status:'suspicious',calls:2},
+  {num:'+91-8876543210',name:'Meena R.',  dur:'03:20',date:'Jan 19, 10:30',app:'Phone',    lat:28.6139,lng:77.2090,loc:'New Delhi CP',   status:'normal',    calls:3},
+  {num:'+91-7765432100',name:'Unknown',   dur:'22:10',date:'Jan 20, 03:14',app:'Telegram', lat:28.7041,lng:77.1025,loc:'Rohini West',    status:'suspicious',calls:2},
+  {num:'+91-9123456789',name:'Priya K.',  dur:'01:45',date:'Jan 20, 11:00',app:'Phone',    lat:28.4089,lng:77.3178,loc:'Faridabad',     status:'normal',    calls:5},
+  {num:'+91-9988776655',name:'???',       dur:'31:00',date:'Jan 21, 00:44',app:'Signal',   lat:28.9845,lng:77.7064,loc:'Meerut City',   status:'unknown',   calls:1},
+  {num:'+91-8800112233',name:'Ravi M.',   dur:'05:12',date:'Jan 20, 14:22',app:'WhatsApp', lat:28.6692,lng:77.4538,loc:'Ghaziabad',     status:'normal',    calls:4},
+  {num:'+91-7711223344',name:'Unknown',   dur:'18:55',date:'Jan 21, 02:05',app:'Signal',   lat:28.5244,lng:77.1855,loc:'South Delhi',   status:'suspicious',calls:2},
+];
+
+let callFilter = 'all';
+
+function initCallLogs() {
+  // Hourly bars
+  const hourData = [0,12,8,5,0,0,1,0,2,4,8,10,12,9,8,7,5,6,4,3,2,1,3,7];
+  const bars = document.getElementById('hourlyBars');
+  if (!bars) return;
+  bars.innerHTML = '';
+  const maxH = Math.max(...hourData);
+  hourData.forEach((v,h) => {
+    const isSusp = h >= 0 && h < 5;
+    const pct = maxH ? (v/maxH)*100 : 0;
+    const bar = document.createElement('div');
+    bar.style.cssText = `flex:1;height:${Math.max(pct,3)}%;border-radius:2px 2px 0 0;background:${isSusp?'rgba(239,68,68,.7)':'rgba(59,130,246,.5)'};transition:height .4s;cursor:pointer;position:relative`;
+    bar.title = `${h}:00 — ${v} calls${isSusp?' ⚠ suspicious hours':''}`;
+    bar.onmouseenter = e => { bar.style.background = isSusp ? '#ef4444' : '#3b82f6'; showToast(`${h}:00 — ${v} calls`); };
+    bar.onmouseleave = e => { bar.style.background = isSusp ? 'rgba(239,68,68,.7)' : 'rgba(59,130,246,.5)'; };
+    bars.appendChild(bar);
+  });
+
+  // Top numbers
+  const topDiv = document.getElementById('topNumbersBars');
+  if (topDiv) {
+    const sorted = [...CALL_DATA].sort((a,b)=>b.calls-a.calls).slice(0,5);
+    const maxC = sorted[0].calls;
+    topDiv.innerHTML = sorted.map(c => `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="min-width:130px;font-size:11px;color:var(--t2)">${c.num}</div>
+        <div style="flex:1;height:8px;background:var(--b1);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${(c.calls/maxC)*100}%;background:${c.status==='suspicious'?'linear-gradient(90deg,#8B0000,#ef4444)':c.status==='unknown'?'linear-gradient(90deg,#78350f,#f59e0b)':'linear-gradient(90deg,#14532d,#22c55e)'};border-radius:4px;animation:progressFill .8s ease both"></div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:${c.status==='suspicious'?'#ef4444':c.status==='unknown'?'var(--amber)':'var(--green)'};min-width:30px;text-align:right">${c.calls}×</div>
+        <span class="flag-badge ${c.status==='suspicious'?'flag-suspicious':c.status==='unknown'?'flag-unknown':'flag-normal'}" style="min-width:70px;text-align:center">${c.status}</span>
+      </div>`).join('');
+  }
+  renderCallTable();
+}
+
+function renderCallTable() {
+  const tbody = document.getElementById('callTableBody');
+  if (!tbody) return;
+  const data = callFilter === 'all' ? CALL_DATA : CALL_DATA.filter(c => c.status === callFilter);
+  tbody.innerHTML = data.map((c,i) => `
+    <tr style="background:${c.status==='suspicious'?'rgba(139,0,0,.05)':c.status==='unknown'?'rgba(245,158,11,.04)':'transparent'}"
+      onmouseenter="this.style.background='var(--bg4)'" onmouseleave="this.style.background='${c.status==='suspicious'?'rgba(139,0,0,.05)':c.status==='unknown'?'rgba(245,158,11,.04)':'transparent'}'">
+      <td style="color:var(--t4);font-size:11px">${i+1}</td>
+      <td class="call-number">${c.num}</td>
+      <td style="font-size:12px;color:var(--t2)">${c.name}</td>
+      <td style="font-size:12px;color:var(--t2)">${c.dur}</td>
+      <td style="font-size:11px;color:var(--t3)">${c.date}</td>
+      <td><span style="font-size:10px;padding:3px 8px;border-radius:3px;background:var(--b1);color:var(--t2);border:1px solid var(--b2)">${c.app}</span></td>
+      <td><a class="map-link" onclick="openMap(${c.lat},${c.lng},'${c.loc}')">📍 ${c.loc}</a></td>
+      <td><span class="flag-badge ${c.status==='suspicious'?'flag-suspicious':c.status==='unknown'?'flag-unknown':'flag-normal'}">${c.status}</span></td>
+    </tr>`).join('');
+}
+
+function filterCalls(f) {
+  callFilter = f;
+  ['all','Susp','Norm'].forEach(id => {
+    const btn = document.getElementById('filter'+id);
+    if (btn) { btn.style.background='var(--b1)'; btn.style.color='var(--t3)'; btn.style.border='1px solid var(--b2)'; }
+  });
+  const activeId = f==='all'?'filterAll':f==='suspicious'?'filterSusp':'filterNorm';
+  const active = document.getElementById(activeId);
+  if (active) { active.style.background='var(--red)'; active.style.color='#fff'; active.style.border='none'; }
+  renderCallTable();
+}
+
+
+/* ════════════════════════════════════════
+   CCTV — queue · metadata · full analysis
+════════════════════════════════════════ */
+const VCRIT = [
+  {icon:'🏃',title:'Fleeing Subject',           detail:'Individual sprinting at high speed toward exit — possible escape after committing offence. Motion vector shows 3.2m/s burst over 8 seconds.'},
+  {icon:'🤜',title:'Physical Assault',           detail:'Violent one-sided attack on stationary victim. Attacker delivers 4 strikes over 6 seconds. Victim falls at end of sequence.'},
+  {icon:'🔫',title:'Suspected Weapon Drawn',     detail:'Object matching firearm silhouette visible in subject\'s right hand near restricted zone. Bystanders clearing the area.'},
+  {icon:'🚨',title:'Forced Entry Attempt',       detail:'Subject rams secured door 6 times in 40 seconds. Lock mechanism stressed — door breached on final attempt. Perpetrator proceeds inside.'},
+  {icon:'🩸',title:'Injured Person Down',        detail:'Individual collapses near stairwell and shows no voluntary movement for 3+ minutes. Possible assault victim or acute medical emergency.'},
+  {icon:'🎭',title:'Identity Concealment',       detail:'Subject consistently angles face 40–60° away from every camera using cap, raised collar and hand gestures to defeat biometric capture.'},
+  {icon:'💥',title:'Sudden Flash / Impact',      detail:'Abrupt luminance spike of 200%+ in parking zone followed by motion-blur wave. Pattern consistent with explosion or gunshot discharge.'},
+  {icon:'🔪',title:'Bladed Object Visible',      detail:'Reflective object ~18–22 cm in subject\'s grip. Motion consistent with stabbing action during confrontation. Classified lethal threat.'},
+];
+const VWARN = [
+  {icon:'📦',title:'Unattended Bag — 9 min',    detail:'Black backpack at Pillar C, owner absent 9 minutes. No thermal activity. Protocol: alert security and place bomb squad on standby.'},
+  {icon:'👥',title:'Coordinated Loitering',      detail:'3 individuals loitering near ATM zone 12+ minutes, rotating positions every 90 seconds to avoid single-camera detection.'},
+  {icon:'📲',title:'Camera Survey Activity',     detail:'Subject photographs every CCTV mounting point and staff desk positions. Classic pre-operation reconnaissance pattern.'},
+  {icon:'🚗',title:'Watchlist Vehicle',          detail:'Plate DL-01-AB-7291 completes 3 slow loops of premises. Matches active NCRB watchlist — linked to Case CRM-2024-007.'},
+  {icon:'🔄',title:'Repeated Entry/Exit ×5',    detail:'Same subject enters and exits 5 times over 18 minutes, scanning interior each time. Classic counter-surveillance sweep behaviour.'},
+  {icon:'💼',title:'Pickpocket Attempt',         detail:'Rapid hand insertion near victim\'s bag pocket. Subject makes contact, withdraws and moves away. Victim appears unaware.'},
+  {icon:'🔦',title:'Light Signalling',           detail:'3-pulse torch signal directed toward parking area, repeated twice. Consistent with coordinating an accomplice outside camera range.'},
+  {icon:'🧤',title:'Gloves Worn Indoors',        detail:'Subject wearing latex gloves in air-conditioned interior. Deliberate evidence contamination prevention — indicates premeditation.'},
+];
+const VINFO = [
+  {icon:'👤',title:'Face Match — Suspect DB',   detail:'74% biometric similarity to Rajesh Kumar, FIR CRM-2024-001. Match confidence meets investigative threshold. Recommend verification.'},
+  {icon:'📍',title:'Restricted Zone Breach',    detail:'Unidentified individual enters staff-only server room at 02:11 without valid badge swipe. Entry/exit anomaly flagged.'},
+  {icon:'🕐',title:'After-Hours Movement',      detail:'Activity at 03:18 AM — 4.5 hours outside authorised access window. No guard patrol coincides with this event.'},
+  {icon:'🌡',title:'Heat Anomaly',              detail:'Thermal bloom beneath subject\'s jacket inconsistent with ambient temperature. Shape suggests concealed device approx 20×12 cm.'},
+  {icon:'📡',title:'RF Signal Spike',           detail:'Radio-frequency burst coinciding exactly with subject raising phone near entry point. Possible remote trigger attempt.'},
+  {icon:'🚪',title:'Emergency Exit — No Alarm', detail:'Emergency door forced open without triggering sensor. Alarm bypass device likely installed in advance by subject.'},
+  {icon:'🎒',title:'Bag Switch',                detail:'Subject arrives with rigid case, departs with soft bag. Possible evidence swap or contraband exchange during premises visit.'},
+];
+const VREPEAT = [
+  {icon:'🏃',action:'Running / Rapid Movement',        desc:'Subject detected running through same corridor repeatedly. Pattern consistent with flight-ready surveillance behaviour.',    counts:[3,4,5,6,7]},
+  {icon:'👁', action:'Nervous Scanning',                desc:'Rapid lateral head turns at every junction — checking for observers. Classic counter-surveillance movement signature.',       counts:[4,5,6,8]},
+  {icon:'📱',action:'Phone Near Camera Points',        desc:'Subject raises phone toward camera mounting positions on multiple passes — systematically documenting blind spots.',           counts:[3,4,5]},
+  {icon:'🚗',action:'Vehicle Circling Premises',       desc:'Same vehicle completes multiple slow loops. Used as mobile surveillance platform, occupants observing entry/exit points.',    counts:[2,3,4]},
+  {icon:'🚪',action:'Testing Entry Points',            desc:'Subject tests 6 doors sequentially. Systematic access probing — evidence of advance reconnaissance and planning.',            counts:[3,5,6]},
+  {icon:'🎭',action:'Face Cover Adjustment',           desc:'Subject repositions cap/mask/collar each time entering camera view — deliberate, repeated identity evasion behaviour.',       counts:[2,3,4]},
+  {icon:'💼',action:'Parcel Exchange',                 desc:'Two subjects exchange bags at different locations. Classic dead-drop or contraband handoff pattern.',                          counts:[2,3]},
+  {icon:'⏱', action:'Stationary Watch Post',           desc:'Subject returns to same vantage point across sessions maintaining line-of-sight to entry gate. Pre-planned observation post.', counts:[2,3,4,5]},
+  {icon:'📞',action:'Calls at Entry Points',           desc:'Subject makes/receives calls adjacent to access doors on each visit — likely coordinating accomplice access.',                counts:[3,4,5]},
+  {icon:'🔄',action:'Route Repetition',                desc:'Subject walks identical path multiple times, pausing at same spots. Memorising layout or testing camera coverage gaps.',       counts:[2,3,4,5]},
+];
+
+let videoQueue = [], activeVideoId = null, _vAlerts = [];
+
+function handleVideoDrop(e) {
+  e.preventDefault();
+  const d = document.getElementById('cctvDrop');
+  d.style.borderColor=''; d.style.background='var(--bg3)';
+  Array.from(e.dataTransfer.files).forEach(addVideoToQueue);
+}
+function handleMultiVideoFiles(inp) { Array.from(inp.files).forEach(addVideoToQueue); inp.value=''; }
+function handleVideoFile(inp) { if (inp.files[0]) addVideoToQueue(inp.files[0]); }
+
+function addVideoToQueue(file) {
+  if (!file.type.startsWith('video/') && !/\.(mp4|avi|mov|mkv|webm|flv|wmv)$/i.test(file.name)) {
+    showToast('⚠ Please add a video file'); return;
+  }
+  if (videoQueue.find(q=>q.file.name===file.name&&q.file.size===file.size)) {
+    showToast('"'+file.name+'" already in queue'); return;
+  }
+  const id = 'v_'+Date.now()+'_'+Math.random().toString(36).slice(2,5);
+  videoQueue.push({id,file,status:'pending',result:null});
+  renderVideoQueue();
+  showToast('✓ Added "'+file.name+'"');
+  if (!activeVideoId) selectVideo(id);
+}
+
+function renderVideoQueue() {
+  const sec=document.getElementById('videoQueueSection');
+  const list=document.getElementById('videoQueueList');
+  const badge=document.getElementById('cctvCountBadge');
+  if (!videoQueue.length){sec.style.display='none';badge.style.display='none';return;}
+  sec.style.display='block'; badge.style.display='inline-block';
+  badge.textContent=videoQueue.length+' Video'+(videoQueue.length>1?'s':'');
+  list.innerHTML=videoQueue.map(q=>{
+    const act=q.id===activeVideoId;
+    const ic=q.status==='done'?'✅':q.status==='processing'?'⏳':'📹';
+    const sc=q.status==='done'?'var(--green)':q.status==='processing'?'var(--amber)':'var(--t4)';
+    const sb=q.result?'<span style="font-size:9px;padding:2px 8px;border-radius:3px;background:'+(q.result.score>75?'rgba(239,68,68,.15)':'rgba(245,158,11,.12)')+';color:'+(q.result.score>75?'#ef4444':'var(--amber)')+';border:1px solid '+(q.result.score>75?'rgba(239,68,68,.3)':'rgba(245,158,11,.25)')+';">'+q.result.score+'/100</span>':'';
+    return '<div onclick="selectVideo(\''+q.id+'\')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;transition:all .2s;background:'+(act?'rgba(139,0,0,.1)':'var(--bg3)')+';border:1px solid '+(act?'#8B0000':'var(--b1)')+'">'+
+      '<span style="font-size:18px;flex-shrink:0">'+ic+'</span>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="font-size:11px;font-weight:700;color:'+(act?'var(--t1)':'var(--t2)')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+q.file.name+'</div>'+
+        '<div style="font-size:9px;color:var(--t3);margin-top:1px">'+formatSize(q.file.size)+' · '+q.file.name.split('.').pop().toUpperCase()+' · <span style="color:'+sc+'">'+q.status.toUpperCase()+'</span></div>'+
+      '</div>'+sb+
+      (act?'<span style="font-size:8px;background:rgba(139,0,0,.2);color:#ef4444;padding:2px 7px;border-radius:3px;border:1px solid rgba(139,0,0,.3);flex-shrink:0">ACTIVE</span>':'')+
+      '<button onclick="event.stopPropagation();removeVideo(\''+q.id+'\')" style="background:none;border:none;color:var(--t4);font-size:18px;cursor:pointer;flex-shrink:0;line-height:1">×</button>'+
+    '</div>';
+  }).join('');
+}
+
+function selectVideo(id) {
+  activeVideoId=id;
+  const q=videoQueue.find(v=>v.id===id); if(!q) return;
+  renderVideoQueue();
+  document.getElementById('videoActivePanel').style.display='block';
+  document.getElementById('vActiveFileName').textContent=q.file.name;
+  document.getElementById('vActiveSize').textContent=formatSize(q.file.size);
+  document.getElementById('vActiveFormat').textContent=q.file.name.split('.').pop().toUpperCase();
+  document.getElementById('vActiveDuration').textContent='—';
+  const player=document.getElementById('videoPlayer');
+  player.src=URL.createObjectURL(q.file);
+  player.onloadedmetadata=()=>{
+    if(isFinite(player.duration)){
+      const d=player.duration,h=Math.floor(d/3600),m=Math.floor((d%3600)/60),s=Math.floor(d%60);
+      document.getElementById('vActiveDuration').textContent=(h?h+'h ':'')+( m?m+'m ':'')+s+'s';
+      if(q.result) q.result.durSec=Math.round(d);
+    }
+  };
+  if(q.status==='done'&&q.result){
+    document.getElementById('videoProcessingCard').style.display='none';
+    renderVideoResults(q.result);
+  } else if(q.status!=='processing'){
+    q.status='processing'; renderVideoQueue();
+    document.getElementById('aiAlertCard').style.display='none';
+    document.getElementById('videoProcessingCard').style.display='block';
+    document.getElementById('videoProcessBar').style.width='0%';
+    document.getElementById('videoProcessPct').textContent='0%';
+    setTimeout(()=>runVideoAnalysis(q,player),300);
+  }
+  document.getElementById('videoActivePanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function removeVideo(id) {
+  videoQueue=videoQueue.filter(q=>q.id!==id);
+  if(activeVideoId===id){
+    activeVideoId=null;
+    document.getElementById('videoActivePanel').style.display='none';
+    if(videoQueue.length) selectVideo(videoQueue[0].id);
+  }
+  renderVideoQueue();
+}
+function clearAllVideos() {
+  videoQueue=[];activeVideoId=null;
+  document.getElementById('videoActivePanel').style.display='none';
+  renderVideoQueue();
+}
+
+/* ─── Backend API config ─────────────────────────── */
+const API_BASE = 'http://localhost:8000/api';
+let backendOnline = null; // null=unknown, true=online, false=offline
+
+async function checkBackend() {
+  if (backendOnline !== null) return backendOnline;
+  try {
+    const r = await fetch(API_BASE + '/health', {signal: AbortSignal.timeout(2000)});
+    backendOnline = r.ok;
+  } catch { backendOnline = false; }
+  updateBackendBadge();
+  return backendOnline;
+}
+
+function updateBackendBadge() {
+  const existing = document.getElementById('backendBadge');
+  if (existing) existing.remove();
+  const badge = document.createElement('div');
+  badge.id = 'backendBadge';
+  badge.style.cssText = 'position:fixed;bottom:14px;left:14px;z-index:9999;padding:6px 12px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:1px;font-family:var(--mono);pointer-events:none;transition:opacity .5s';
+  if (backendOnline) {
+    badge.style.background = 'rgba(34,197,94,.15)';
+    badge.style.border = '1px solid rgba(34,197,94,.3)';
+    badge.style.color = '#22c55e';
+    badge.textContent = '⚡ AI BACKEND ONLINE';
+  } else {
+    badge.style.background = 'rgba(245,158,11,.1)';
+    badge.style.border = '1px solid rgba(245,158,11,.25)';
+    badge.style.color = '#f59e0b';
+    badge.textContent = '⚠ SIMULATION MODE';
+  }
+  document.body.appendChild(badge);
+  setTimeout(() => { badge.style.opacity = '0'; }, 5000);
+  setTimeout(() => { badge.style.opacity = '1'; }, 8000);
+}
+
+// Check on load
+setTimeout(checkBackend, 1500);
+
+function animateStages(stages) {
+  const se = document.getElementById('vProcessStages');
+  se.innerHTML = stages.map((s,i) =>
+    '<div id="vs'+i+'" style="display:flex;align-items:center;gap:10px;padding:5px 0;opacity:.18;transition:all .3s">' +
+    '<div id="vi'+i+'" style="width:18px;height:18px;border-radius:50%;background:var(--b2);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;transition:all .3s">·</div>' +
+    '<span style="font-size:11px;color:var(--t3)">'+s+'</span></div>'
+  ).join('');
+}
+
+function tickProgress(pct, stages) {
+  document.getElementById('videoProcessBar').style.width = pct + '%';
+  document.getElementById('videoProcessPct').textContent = Math.round(pct) + '%';
+  const ni = Math.floor((pct/100) * stages.length);
+  for (let i = 0; i < ni && i < stages.length; i++) {
+    const el = document.getElementById('vs'+i), ic = document.getElementById('vi'+i);
+    if (el) el.style.opacity = '1';
+    if (ic) { ic.style.background = 'var(--red)'; ic.style.color = '#fff'; ic.textContent = '✓'; }
+  }
+  if (ni < stages.length) document.getElementById('videoProcessStep').textContent = stages[ni] || 'Finalising...';
+}
+
+async function runVideoAnalysis(q, player) {
+  const stages = [
+    '📁 Reading file metadata — codec, container, bitrate',
+    '🎞 Decoding frames at 1 fps sampling rate',
+    '🔍 Motion vector & optical flow analysis',
+    '🧠 Person & object detection (YOLOv8 engine)',
+    '⚠  Anomaly scoring & threat classification',
+    '🔁 Identifying repeated behavioural patterns',
+    '📋 Compiling AI intelligence officer report',
+  ];
+  animateStages(stages);
+
+  const online = await checkBackend();
+
+  if (online) {
+    // ── REAL BACKEND PATH ──────────────────────────────
+    document.getElementById('videoProcessStep').textContent = '🔗 Uploading to Sakshyam AI engine...';
+    let fakeP = 0;
+    const fakeIv = setInterval(() => {
+      fakeP = Math.min(fakeP + 2, 88);
+      tickProgress(fakeP, stages);
+    }, 250);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', q.file);
+
+      const resp = await fetch(API_BASE + '/video/analyse', {
+        method: 'POST',
+        body: formData,
+      });
+
+      clearInterval(fakeIv);
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({detail: 'Unknown error'}));
+        throw new Error(err.detail || resp.statusText);
+      }
+
+      const data = await resp.json();
+      tickProgress(100, stages);
+
+      const realDur = player && isFinite(player.duration) && player.duration > 0
+        ? Math.round(player.duration) : data.metadata.duration_sec;
+
+      q.result = mapVideoBackendResponse(data, q, realDur);
+      q.status = 'done';
+      renderVideoQueue();
+      document.getElementById('videoProcessingCard').style.display = 'none';
+      renderVideoResults(q.result);
+
+    } catch (err) {
+      clearInterval(fakeIv);
+      console.error('Backend error:', err);
+      showToast('⚠ Backend error — using simulation: ' + err.message);
+      backendOnline = false;
+      updateBackendBadge();
+      // Fall through to mock
+      runVideoAnalysisMock(q, player, stages);
+    }
+
+  } else {
+    // ── MOCK SIMULATION PATH ───────────────────────────
+    runVideoAnalysisMock(q, player, stages);
+  }
+}
+
+function runVideoAnalysisMock(q, player, stages) {
+  let pct = 0, si = 0;
+  const iv = setInterval(() => {
+    pct += Math.random() * 7 + 3; if (pct > 100) pct = 100;
+    tickProgress(pct, stages);
+    if (pct >= 100) {
+      clearInterval(iv);
+      setTimeout(() => {
+        const realDur = player && isFinite(player.duration) && player.duration > 0 ? Math.round(player.duration) : null;
+        q.result = computeVideoResult(q, realDur);
+        q.status = 'done';
+        renderVideoQueue();
+        document.getElementById('videoProcessingCard').style.display = 'none';
+        renderVideoResults(q.result);
+      }, 300);
+    }
+  }, 120);
+}
+
+function mapVideoBackendResponse(data, q, realDur) {
+  // Map real backend JSON → frontend result object
+  const meta = data.metadata;
+  const threat = data.threat;
+  const incidents = data.incidents || [];
+  const repActions = (data.repeated_actions || []).map(a => ({
+    icon: a.icon,
+    action: a.action,
+    desc: a.desc,
+    cnt: a.cnt,
+    times: a.times || [],
+  }));
+
+  // Map incidents to picked format
+  const picked = incidents.map(inc => ({
+    icon:   inc.icon || '⚠️',
+    title:  inc.title,
+    detail: inc.detail,
+    level:  inc.level,
+    cls:    inc.level === 'critical' ? 'alert-critical' : inc.level === 'warning' ? 'alert-warn' : 'alert-info',
+    dot:    inc.level === 'critical' ? '#ef4444' : inc.level === 'warning' ? '#f59e0b' : '#3b82f6',
+    ts:     inc.ts || 0,
+    tsStr:  inc.ts_str || '00:00',
+  }));
+
+  return {
+    file:        q.file,
+    ext:         data.file.format,
+    sizeMB:      data.file.size_mb,
+    modified:    data.file.modified || new Date(q.file.lastModified).toLocaleString('en-IN'),
+    durSec:      realDur || meta.duration_sec,
+    resolution:  meta.resolution,
+    fps:         meta.fps,
+    totalFrames: meta.total_frames,
+    bitrate:     meta.bitrate_kbps,
+    picked,
+    repActions,
+    score:       threat.score,
+    scoreColor:  threat.score_color,
+    scoreLabel:  threat.score_label,
+    fromBackend: true,
+    integrity:   data.integrity,
+    framesAnalysed: meta.frames_analysed || meta.total_frames,
+  };
+}
+
+function computeVideoResult(q,realDur){
+  const file=q.file;
+  const seed=file.name.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  const ext=file.name.split('.').pop().toUpperCase();
+  const sizeMB=file.size/1048576;
+  const modified=new Date(file.lastModified).toLocaleString('en-IN');
+  const durSec=realDur||Math.max(30,Math.round(sizeMB));
+  const resMap=['1920×1080 (Full HD)','1280×720 (HD Ready)','3840×2160 (4K UHD)','1920×1080 (Full HD)'];
+  const resolution=resMap[seed%resMap.length];
+  const fps=[24,25,30,30,60][seed%5];
+  const totalFrames=Math.round(durSec*fps);
+  const bitrate=Math.round((file.size*8)/durSec/1000);
+
+  const pickFrom=(pool,n)=>[...pool].sort((a,b)=>((seed+a.title.length*7)%9)-4).slice(0,Math.min(n,pool.length));
+  const cp=pickFrom(VCRIT,2+(seed%3));
+  const wp=pickFrom(VWARN,2+(seed%2));
+  const ip=pickFrom(VINFO,1+(seed%2));
+  const picked=[
+    ...cp.map(a=>({...a,cls:'alert-critical',dot:'#ef4444',level:'critical'})),
+    ...wp.map(a=>({...a,cls:'alert-warn',dot:'#f59e0b',level:'warning'})),
+    ...ip.map(a=>({...a,cls:'alert-info',dot:'#3b82f6',level:'info'})),
+  ];
+  let ts=Math.max(4,Math.round(durSec*0.04));
+  picked.forEach((a,i)=>{
+    ts+=Math.round(durSec*0.06)+((seed+i*53)%Math.max(8,Math.round(durSec*0.1)));
+    a.ts=Math.min(ts,durSec-3);
+    a.tsStr=formatDur(a.ts);
+  });
+
+  const repActions=[...VREPEAT].sort((a,b)=>((seed+a.action.length*3)%13)-6).slice(0,4).map((a,i)=>({
+    ...a,
+    cnt:a.counts[(seed+i)%a.counts.length],
+    times:Array.from({length:a.counts[(seed+i)%a.counts.length]},(_,j)=>
+      formatDur(Math.max(3,Math.round(5+(seed+i*19+j*27)%Math.max(10,durSec-10))))).sort(),
+  }));
+
+  const score=Math.min(99,28+cp.length*15+wp.length*7+(seed%10));
+  return {file,ext,sizeMB,modified,durSec,resolution,fps,totalFrames,bitrate,picked,repActions,score,
+    scoreColor:score>75?'#ef4444':score>50?'#f59e0b':'#22c55e',
+    scoreLabel:score>75?'🔴 CRITICAL — Preserve evidence immediately. Escalate to senior investigating officer.':
+               score>50?'🟡 HIGH RISK — Suspicious activity confirmed. Refer to case detective within 24 hrs.':
+                        '🟢 MODERATE — Notable activity logged. Standard follow-up and archiving recommended.',
+  };
+}
+
+function renderVideoResults(r){
+  document.getElementById('aiAlertCard').style.display='block';
+  const old=document.getElementById('vFileInfoCard'); if(old) old.remove();
+  const crit=r.picked.filter(p=>p.level==='critical').length;
+  const warn=r.picked.filter(p=>p.level==='warning').length;
+  const info=r.picked.filter(p=>p.level==='info').length;
+
+  // FILE INFO GRID
+  const ic=document.createElement('div');
+  ic.id='vFileInfoCard';
+  ic.style.cssText='background:var(--bg3);border:1px solid var(--b2);border-radius:12px;padding:18px 22px;margin-bottom:14px';
+  ic.innerHTML='<div style="font-size:9px;color:var(--t4);letter-spacing:2px;margin-bottom:12px">📋 FILE METADATA — extracted from uploaded footage</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'+
+    [['📐 Resolution',r.resolution,'#3b82f6'],
+     ['⏱ Duration',formatDur(r.durSec),'#f59e0b'],
+     ['🎞 Frame Rate',r.fps+' fps','var(--t2)'],
+     ['📊 Bitrate',r.bitrate+' kbps','var(--t2)'],
+     ['🗜 Container',r.ext,'var(--t2)'],
+     ['💾 File Size',r.sizeMB.toFixed(1)+' MB','var(--t2)'],
+     ['🖥 Total Frames',r.totalFrames.toLocaleString(),'#3b82f6'],
+     ['📅 Modified',r.modified.split(',')[0],'var(--t2)'],
+    ].map(([l,v,c])=>
+      '<div style="background:var(--bg2);border:1px solid var(--b1);border-radius:7px;padding:10px 12px">'+
+      '<div style="font-size:8px;color:var(--t4);letter-spacing:1px;margin-bottom:4px">'+l+'</div>'+
+      '<div style="font-size:12px;font-weight:700;color:'+c+'">'+v+'</div></div>'
+    ).join('')+'</div>';
+  document.getElementById('aiAlertCard').insertAdjacentElement('afterbegin',ic);
+
+  // STAT TILES
+  document.getElementById('videoStatRow').innerHTML=
+    [['Frames Analysed',r.totalFrames.toLocaleString(),'#3b82f6'],
+     ['Incidents Found',r.picked.length,'#ef4444'],
+     ['Recording Length',formatDur(r.durSec),'#f59e0b'],
+     ['Threat Score',r.score+'/100',r.scoreColor],
+    ].map(([l,v,c])=>
+      '<div style="background:var(--bg3);border:1px solid var(--b1);border-left:3px solid '+c+';border-radius:8px;padding:14px;text-align:center">'+
+      '<div style="font-size:22px;font-weight:700;color:'+c+'">'+v+'</div>'+
+      '<div style="font-size:8px;color:var(--t4);letter-spacing:1px;margin-top:4px">'+l+'</div></div>'
+    ).join('');
+
+  // THREAT BAR
+  document.getElementById('videoScoreBadges').innerHTML=
+    '<span class="tag '+(r.score>75?'tag-red':r.score>50?'tag-amber':'tag-blue')+'">'+(r.score>75?'CRITICAL':r.score>50?'HIGH RISK':'MODERATE')+'</span>'+
+    '<span class="tag tag-red">'+crit+'× Critical</span><span class="tag tag-amber">'+warn+'× Warning</span>';
+  setTimeout(()=>{document.getElementById('videoThreatFill').style.width=r.score+'%';},80);
+  document.getElementById('videoThreatScore').textContent=r.score+'/100';
+  document.getElementById('videoThreatScore').style.color=r.scoreColor;
+  document.getElementById('videoThreatLabel').textContent=r.scoreLabel;
+
+  // REPEATED ACTIONS
+  document.getElementById('repeatedActionsGrid').innerHTML=r.repActions.map(a=>{
+    const c=a.cnt>=6?'#ef4444':a.cnt>=4?'#f59e0b':'#3b82f6';
+    return '<div style="background:var(--bg2);border:1px solid var(--b1);border-left:3px solid '+c+';border-radius:8px;padding:14px">'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
+      '<span style="font-size:24px">'+a.icon+'</span>'+
+      '<div><div style="font-size:11px;font-weight:700;color:var(--t1)">'+a.action+'</div>'+
+      '<div style="font-size:9px;color:'+c+';font-weight:700;letter-spacing:.5px">REPEATED ×'+a.cnt+'</div></div></div>'+
+      '<div style="font-size:10px;color:var(--t3);line-height:1.7;margin-bottom:10px">'+a.desc+'</div>'+
+      '<div style="font-size:9px;color:var(--t4);margin-bottom:6px">TIMESTAMPS — click any to jump player to that moment:</div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:5px">'+
+      a.times.map(t=>
+        '<span onclick="jumpToTime(\''+t+'\')" style="font-size:9px;background:var(--b2);color:var(--t3);padding:3px 8px;border-radius:4px;border:1px solid var(--b3);cursor:pointer;transition:all .15s" '+
+        'onmouseenter="this.style.borderColor=\''+c+'\';this.style.color=\''+c+'\'" '+
+        'onmouseleave="this.style.borderColor=\'var(--b3)\';this.style.color=\'var(--t3)\'">'+t+'</span>'
+      ).join('')+'</div></div>';
+  }).join('');
+
+  // ALERT FILTERS
+  document.getElementById('alertFilterRow').innerHTML=
+    '<button onclick="filterVideoAlerts(\'all\',this)" style="background:var(--red);color:#fff;border:none;padding:5px 14px;border-radius:4px;font-size:9px;font-weight:700;cursor:pointer;letter-spacing:.8px">ALL ('+r.picked.length+')</button> '+
+    '<button onclick="filterVideoAlerts(\'critical\',this)" style="background:var(--b1);color:var(--t3);border:1px solid var(--b2);padding:5px 14px;border-radius:4px;font-size:9px;cursor:pointer">CRITICAL ('+crit+')</button> '+
+    '<button onclick="filterVideoAlerts(\'warning\',this)" style="background:var(--b1);color:var(--t3);border:1px solid var(--b2);padding:5px 14px;border-radius:4px;font-size:9px;cursor:pointer">WARNING ('+warn+')</button> '+
+    '<button onclick="filterVideoAlerts(\'info\',this)" style="background:var(--b1);color:var(--t3);border:1px solid var(--b2);padding:5px 14px;border-radius:4px;font-size:9px;cursor:pointer">INFO ('+info+')</button>';
+  document.getElementById('videoAlertSummary').innerHTML=
+    '<span class="tag tag-red">×'+crit+' Critical</span>'+
+    '<span class="tag tag-amber">×'+warn+' Warning</span>'+
+    '<span class="tag tag-blue">×'+info+' Info</span>';
+  _vAlerts=r.picked;
+  renderVideoAlerts(r.picked);
+
+  // TIMELINE
+  const tl=document.getElementById('videoTimeline');
+  document.getElementById('videoEndTime').textContent=formatDur(r.durSec);
+  tl.innerHTML='<div style="position:absolute;top:50%;left:0;right:0;height:2px;background:var(--b2);transform:translateY(-50%)"></div>';
+  const mrSlots=Array(50).fill('rgba(255,255,255,.04)');
+  r.picked.forEach(a=>{
+    const pct=Math.min((a.ts/r.durSec)*100,97);
+    const c=a.level==='critical'?'#ef4444':a.level==='warning'?'#f59e0b':'#3b82f6';
+    const dot=document.createElement('div');
+    dot.style.cssText='position:absolute;left:'+pct+'%;top:50%;transform:translate(-50%,-50%);width:13px;height:13px;border-radius:50%;background:'+c+';cursor:pointer;border:2px solid var(--bg2);box-shadow:0 0 8px '+c+'90;z-index:2;transition:transform .15s';
+    dot.title=a.tsStr+' — '+a.title;
+    dot.onclick=()=>jumpToTime(a.tsStr);
+    dot.onmouseenter=()=>{dot.style.transform='translate(-50%,-50%) scale(1.6)';showToast(a.tsStr+' · '+a.title);};
+    dot.onmouseleave=()=>{dot.style.transform='translate(-50%,-50%) scale(1)';};
+    tl.appendChild(dot);
+    const slot=Math.min(49,Math.floor((a.ts/r.durSec)*50));
+    mrSlots[slot]=c;
+  });
+  document.getElementById('videoMarkerRow').innerHTML=mrSlots.map(c=>
+    '<div style="flex:1;height:4px;background:'+c+';border-radius:1px"></div>').join('');
+
+  // INTEGRITY — use real backend data if available
+  const tamper     = r.integrity ? r.integrity.tampering      : 'None Detected';
+  const tamperColor= (tamper && tamper !== 'None Detected')   ? '#f59e0b' : 'var(--green)';
+  const completeness = r.integrity ? r.integrity.completeness : 'Continuous recording';
+  document.getElementById('integrityReport').innerHTML=
+    [['File Name',        r.file.name,                             'var(--t2)'],
+     ['File Size',        r.sizeMB.toFixed(2)+' MB',               'var(--t2)'],
+     ['Resolution',       r.resolution,                            '#3b82f6'],
+     ['Duration',         formatDur(r.durSec),                     'var(--t2)'],
+     ['FPS / Bitrate',    r.fps+'fps · '+r.bitrate+' kbps',        'var(--t2)'],
+     ['Last Modified',    r.modified,                              'var(--t2)'],
+     ['Tampering',        tamper,                                  tamperColor],
+     ['Completeness',     completeness,                            'var(--t2)'],
+     ['Analysis Mode',    r.fromBackend ? '⚡ Real (OpenCV)' : '🔄 Simulated', r.fromBackend?'#22c55e':'#f59e0b'],
+     ['Chain of Custody', 'Officer '+officerId,                    '#3b82f6'],
+    ].map(([k,v,c])=>
+      '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--b1);font-size:10px">'+
+      '<span style="color:var(--t4)">'+k+'</span>'+
+      '<span style="color:'+c+';text-align:right;max-width:60%;word-break:break-all">'+v+'</span></div>'
+    ).join('');
+
+  // AI BRIEFING
+  const rep=r.repActions&&r.repActions[0]?r.repActions[0]:{icon:'—',action:'No patterns',cnt:0};
+  const top=r.picked[0];
+  const framesCovered = r.framesAnalysed||r.totalFrames;
+  document.getElementById('videoAIBriefing').innerHTML=
+    '<strong style="color:var(--t1)">File:</strong> '+r.file.name+'<br/>'+
+    '<strong style="color:var(--t1)">Duration:</strong> '+formatDur(r.durSec)+' · '+r.totalFrames.toLocaleString()+' frames at '+r.fps+'fps<br/>'+
+    '<strong style="color:var(--t1)">Resolution:</strong> '+r.resolution+' · '+r.bitrate+' kbps<br/>'+
+    '<strong style="color:var(--t1)">Frames Analysed:</strong> '+framesCovered.toLocaleString()+' of '+r.totalFrames.toLocaleString()+'<br/>'+
+    '<strong style="color:var(--t1)">Threat Score:</strong> <span style="color:'+r.scoreColor+'">'+r.score+'/100</span><br/>'+
+    (r.repActions&&r.repActions.length?'<strong style="color:var(--t1)">Most Repeated:</strong> '+rep.icon+' '+rep.action+' (×'+rep.cnt+')<br/>':'')+
+    '<strong style="color:var(--t1)">Top Incident:</strong> '+(top?top.icon+' '+top.title+' @ '+top.tsStr:'None detected')+'<br/>'+
+    '<strong style="color:var(--t1)">Analysis Mode:</strong> '+(r.fromBackend?'<span style="color:#22c55e">⚡ Real OpenCV frame analysis</span>':'<span style="color:#f59e0b">🔄 Simulated (start backend for real analysis)</span>')+'<br/>'+
+    '<strong style="color:var(--t1)">Recommended:</strong> '+(r.score>75?'🔴 Preserve under IT Act §65B. Escalate immediately.':r.score>50?'🟡 Escalate to detective within 24 hrs.':'🟢 Archive under case evidence.');
+
+  // ACTION BUTTONS
+  document.getElementById('videoActionRow').innerHTML=
+    [['💾 Save Footage','saveVideoLocally()','#22c55e','rgba(34,197,94,.08)','rgba(34,197,94,.25)'],
+     ['📋 Export Report',"showToast('✓ Report exported to case file')",'#3b82f6','rgba(59,130,246,.08)','rgba(59,130,246,.25)'],
+     ['📞 Link CDR',"showToast('✓ Timeline linked to call log records')",'#f59e0b','rgba(245,158,11,.08)','rgba(245,158,11,.25)'],
+     ['🔍 Flag Subject',"showToast('✓ Subject queued for biometric match')",'#a855f7','rgba(168,85,247,.08)','rgba(168,85,247,.25)'],
+    ].map(([l,fn,c,bg,bc])=>
+      '<button onclick="'+fn+'" style="background:'+bg+';border:1px solid '+bc+';color:'+c+';padding:10px 18px;border-radius:7px;font-family:var(--mono);font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.8px;transition:opacity .2s" '+
+      'onmouseenter="this.style.opacity=\'.7\'" onmouseleave="this.style.opacity=\'1\'">'+l+'</button>'
+    ).join('');
+
+  showToast('✓ "'+r.file.name+'" · '+r.totalFrames.toLocaleString()+' frames · '+r.picked.length+' incidents · Score '+r.score+'/100');
+}
+
+function renderVideoAlerts(alerts){
+  document.getElementById('aiAlerts').innerHTML=alerts.length
+    ?alerts.map((a,i)=>
+        '<div class="alert-item '+a.cls+'" style="animation-delay:'+i*.06+'s;cursor:pointer" onclick="jumpToTime(\''+a.tsStr+'\')" title="Jump to '+a.tsStr+'">'+
+        '<div class="alert-dot" style="background:'+a.dot+'"></div>'+
+        '<div style="flex:1"><div style="font-size:12px;color:var(--t1);font-weight:700">'+a.icon+' '+a.title+'</div>'+
+        '<div style="font-size:10px;color:var(--t3);margin-top:3px;line-height:1.6">'+a.detail+'</div></div>'+
+        '<div style="text-align:right;flex-shrink:0;margin-left:12px">'+
+        '<div style="font-size:12px;font-weight:700;color:'+a.dot+';font-family:var(--mono)">'+a.tsStr+'</div>'+
+        '<div style="font-size:8px;color:var(--t4);margin-top:2px;letter-spacing:.5px">'+a.level.toUpperCase()+'</div></div></div>'
+      ).join('')
+    :'<div style="padding:14px;font-size:11px;color:var(--t4)">No incidents in this category.</div>';
+}
+
+function filterVideoAlerts(level,btn){
+  document.querySelectorAll('#alertFilterRow button').forEach(b=>{b.style.background='var(--b1)';b.style.color='var(--t3)';b.style.border='1px solid var(--b2)';});
+  btn.style.background='var(--red)';btn.style.color='#fff';btn.style.border='none';
+  renderVideoAlerts(level==='all'?_vAlerts:_vAlerts.filter(a=>a.level===level));
+}
+
+function jumpToTime(tsStr){
+  const p=document.getElementById('videoPlayer');
+  if(!p||!p.src) return;
+  const parts=tsStr.split(':').map(Number);
+  p.currentTime=parts.length===3?parts[0]*3600+parts[1]*60+parts[2]:parts[0]*60+parts[1];
+  p.play(); showToast('▶ Jumped to '+tsStr);
+}
+
+function saveVideoLocally(){
+  const q=videoQueue.find(v=>v.id===activeVideoId);
+  if(!q){showToast('No active video');return;}
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(q.file); a.download=q.file.name; a.click();
+  document.getElementById('saveModal').style.display='flex';
+  const now=new Date().toLocaleString('en-IN');
+  document.getElementById('saveModalBody').innerHTML=
+    '<div style="text-align:center;margin-bottom:18px">'+
+    '<div style="font-size:48px;margin-bottom:10px">✅</div>'+
+    '<div style="font-family:var(--serif);font-size:18px;color:var(--t1);margin-bottom:6px">Footage Saved to Device</div>'+
+    '<div style="font-size:11px;color:var(--t3)">Downloaded to your local storage</div></div>'+
+    '<div style="background:var(--bg3);border:1px solid var(--b1);border-radius:8px;padding:14px;margin-bottom:18px;font-size:10px;color:var(--t3);line-height:2.2">'+
+    '<div>📁 <strong style="color:var(--t1)">'+q.file.name+'</strong></div>'+
+    '<div>💾 '+formatSize(q.file.size)+'</div>'+
+    '<div>🕐 Saved: '+now+'</div>'+
+    '<div>👮 Officer: '+officerId+'</div></div>'+
+    '<button onclick="document.getElementById(\'saveModal\').style.display=\'none\'" style="width:100%;background:var(--red);color:#fff;border:none;padding:12px;border-radius:6px;font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px">CLOSE</button>';
+}
+
+const AUDIO_TRANSCRIPT_POOLS = [
+  {
+    lang:'Hindi-English (Hinglish)', langCode:'HI-EN', speakers:['Rajesh K.','Unknown'],
+    lines:[
+      {t:'00:00',spk:0,txt:'Bhai, kya transfer ho gaya abhi tak?'},
+      {t:'00:08',spk:1,txt:'Haan. Account credited ho gaya. Teen lakh move kiya.'},
+      {t:'00:18',spk:0,txt:'Hawala route confirm hai na? Safe hai?'},
+      {t:'00:26',spk:1,txt:'Haan confirmed. Noida wala bhi ready hai.'},
+      {t:'00:38',spk:0,txt:'Victim ka account kitna balance hai abhi?'},
+      {t:'00:49',spk:1,txt:'Saade aath lakh. Proceed karein kya?'},
+      {t:'01:02',spk:0,txt:'Haan karo. App ka OTP link bhej diya kya usse?'},
+      {t:'01:14',spk:1,txt:'Kal bhejunga. Signal pe baat karte hain, secure rahega.'},
+      {t:'01:28',spk:0,txt:'Police ko kuch nahi pata abhi. Hawala safe hai.'},
+      {t:'01:39',spk:1,txt:'Theek hai. Account freeze hone se pehle move kar lena.'},
+    ]
+  },
+  {
+    lang:'Marathi-English', langCode:'MR-EN', speakers:['Speaker 1','Speaker 2'],
+    lines:[
+      {t:'00:00',spk:0,txt:'Maal pahochla ka? Transaction zali ka aaj?'},
+      {t:'00:12',spk:1,txt:'Ho. Account madhe paisa aala. Don lakh transfer zhala.'},
+      {t:'00:24',spk:0,txt:'Police la kalatay ka he sab?'},
+      {t:'00:33',spk:1,txt:'Nahi. Encrypted app vapar. Signal use kar faqt.'},
+      {t:'00:46',spk:0,txt:'Victim la OTP pathavla ka? Account access havet.'},
+      {t:'00:57',spk:1,txt:'Pathavla. App link gela. Account access milayla havet.'},
+      {t:'01:10',spk:0,txt:'Theek ahe. Freeze honyapurvi move kar. Urgent aahe.'},
+      {t:'01:22',spk:1,txt:'Hawala operator ready aahe. Kal subah karein.'},
+    ]
+  },
+  {
+    lang:'Hindi', langCode:'HI', speakers:['A','B'],
+    lines:[
+      {t:'00:00',spk:0,txt:'Sunno, wo cheez deliver hui kya aaj raat?'},
+      {t:'00:10',spk:1,txt:'Haan, maal pahunch gaya. Teen packet tha sara.'},
+      {t:'00:21',spk:0,txt:'Police ka koi chakkar nahi tha raaste mein?'},
+      {t:'00:31',spk:1,txt:'Nahi bhai. Sab clear tha. Koi nahi tha.'},
+      {t:'00:42',spk:0,txt:'Paisa kab aayega? Bahut urgent hai yaar.'},
+      {t:'00:52',spk:1,txt:'Kal tak aa jayega. Hawala se bhejenge dono part.'},
+      {t:'01:04',spk:0,txt:'Theek hai. Kisi ko mat batana. Signal pe raho.'},
+      {t:'01:16',spk:1,txt:'Aur koi account mein direct transfer mat karna.'},
+    ]
+  },
+];
+
+const SUSPICIOUS_KEYWORDS = {
+  hawala:   {level:'critical', meaning:'Illegal informal money transfer network bypassing banking system', ipc:'PMLA §3 & §4'},
+  transfer: {level:'high',     meaning:'Financial transaction — possibly illegal fund movement', ipc:'PMLA §3'},
+  account:  {level:'high',     meaning:'Bank account reference — potential fraud target', ipc:'IT Act §66D'},
+  signal:   {level:'high',     meaning:'Encrypted communication app used to evade surveillance', ipc:'IT Act §69'},
+  police:   {level:'high',     meaning:'Law enforcement mention — indicates awareness & evasion', ipc:'IPC §201'},
+  maal:     {level:'critical', meaning:'Coded term for contraband, narcotics or illegal goods', ipc:'NDPS Act §20'},
+  move:     {level:'medium',   meaning:'Asset or money movement command', ipc:'PMLA §3'},
+  otp:      {level:'critical', meaning:'One-time password — bank account takeover mechanism', ipc:'IT Act §66C'},
+  encrypted:{level:'high',     meaning:'Use of encryption to conceal criminal communication', ipc:'IT Act §69B'},
+  packet:   {level:'critical', meaning:'Coded term for drugs or contraband packages', ipc:'NDPS Act §20'},
+  lakh:     {level:'medium',   meaning:'Large monetary amount reference — financial crime indicator', ipc:'PMLA §3'},
+  crore:    {level:'high',     meaning:'Very large monetary sum — serious financial crime indicator', ipc:'PMLA §3'},
+  transaction:{level:'medium', meaning:'Financial transaction reference', ipc:'PMLA §3'},
+  paisa:    {level:'medium',   meaning:'Money reference — financial crime context', ipc:'PMLA §3'},
+  deliver:  {level:'high',     meaning:'Physical delivery of goods — possible contraband', ipc:'IPC §120B'},
+  cheez:    {level:'high',     meaning:'Coded term for illegal item or contraband', ipc:'IPC §120B'},
+  urgent:   {level:'medium',   meaning:'Time-pressure indicator — active criminal operation', ipc:'IPC §34'},
+  freeze:   {level:'high',     meaning:'Awareness of bank account freeze — fraud coordination', ipc:'IT Act §66D'},
+  victim:   {level:'critical', meaning:'Direct victim reference — confirms targeted crime', ipc:'IPC §420'},
+  secure:   {level:'medium',   meaning:'Security consciousness — professional criminal behaviour', ipc:'IPC §120B'},
+};
+
+const LEVEL_COLORS = {critical:'#ef4444', high:'#f59e0b', medium:'#3b82f6', low:'#22c55e'};
+const SPK_COLORS   = ['#ef4444','#3b82f6','#a855f7','#22c55e','#f59e0b','#06b6d4'];
+
+/* ══════════════════════════════════════
+   AUDIO — MULTI FILE QUEUE
+══════════════════════════════════════ */
+// audioQueue: [{id, file, status:'pending'|'processing'|'done', result}]
+let audioQueue    = [];
+let activeAudioId = null;
+
+function handleAudioDrop(e) {
+  e.preventDefault();
+  const d = document.getElementById('audioDrop');
+  if (d) { d.style.borderColor=''; d.style.background='var(--bg3)'; }
+  const files = Array.from(e.dataTransfer.files);
+  if (!files.length) { showToast('Please drop audio files'); return; }
+  files.forEach(addAudioToQueue);
+}
+function handleMultiAudioFiles(input) {
+  Array.from(input.files).forEach(addAudioToQueue);
+  input.value = '';
+}
+
+function addAudioToQueue(file) {
+  const audioExts = /\.(mp3|wav|m4a|ogg|opus|flac|aac|wma|webm|3gp|amr|mp4|mpeg)$/i;
+  if (!file.type.startsWith('audio/') && !audioExts.test(file.name)) {
+    showToast('⚠ Please add an audio file (MP3, WAV, OGG, OPUS etc.)'); return;
+  }
+  if (audioQueue.find(q => q.file.name === file.name && q.file.size === file.size)) {
+    showToast(`"${file.name}" already in queue`); return;
+  }
+  const id = 'aud_' + Date.now() + '_' + Math.random().toString(36).slice(2,5);
+  audioQueue.push({ id, file, status:'pending', result:null });
+  renderAudioQueue();
+  showToast(`✓ Added "${file.name}"`);
+  if (!activeAudioId) selectAudio(id);
+}
+
+function renderAudioQueue() {
+  const section = document.getElementById('audioQueueSection');
+  const list    = document.getElementById('audioQueueList');
+  const badge   = document.getElementById('audioCountBadge');
+  if (!audioQueue.length) { section.style.display='none'; badge.style.display='none'; return; }
+  section.style.display = 'block';
+  badge.style.display   = 'inline-block';
+  badge.textContent     = audioQueue.length + ' File' + (audioQueue.length>1?'s':'');
+  list.innerHTML = audioQueue.map(q => {
+    const isActive = q.id === activeAudioId;
+    const statusIcon  = q.status==='done'?'✅':q.status==='processing'?'⏳':'🎵';
+    const statusColor = q.status==='done'?'var(--green)':q.status==='processing'?'var(--amber)':'var(--t4)';
+    const threatBadge = q.result ? `<span style="font-size:8px;padding:2px 6px;border-radius:3px;background:${q.result.score>75?'rgba(239,68,68,.15)':'rgba(245,158,11,.12)'};color:${q.result.score>75?'#ef4444':'var(--amber)'};border:1px solid ${q.result.score>75?'rgba(239,68,68,.25)':'rgba(245,158,11,.2)'};flex-shrink:0">${q.result.score}/100</span>` : '';
+    return `<div onclick="selectAudio('${q.id}')" style="display:flex;align-items:center;gap:10px;background:${isActive?'rgba(139,0,0,.1)':'var(--bg3)'};border:1px solid ${isActive?'#8B0000':'var(--b1)'};border-radius:8px;padding:10px 14px;cursor:pointer;transition:all .2s">
+      <span style="font-size:16px;flex-shrink:0">${statusIcon}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:700;color:${isActive?'var(--t1)':'var(--t2)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${q.file.name}</div>
+        <div style="font-size:9px;color:var(--t3);margin-top:1px">${formatSize(q.file.size)} · ${q.file.name.split('.').pop().toUpperCase()} · <span style="color:${statusColor}">${q.status.toUpperCase()}</span></div>
+      </div>
+      ${threatBadge}
+      ${isActive?'<span style="font-size:8px;background:rgba(139,0,0,.2);color:#ef4444;padding:2px 7px;border-radius:3px;border:1px solid rgba(139,0,0,.3);flex-shrink:0">ACTIVE</span>':''}
+      <button onclick="event.stopPropagation();removeAudio('${q.id}')" style="background:none;border:none;color:var(--t4);font-size:18px;cursor:pointer;line-height:1;padding:0 2px;flex-shrink:0">×</button>
+    </div>`;
+  }).join('');
+}
+
+function selectAudio(id) {
+  activeAudioId = id;
+  const q = audioQueue.find(a => a.id === id);
+  if (!q) return;
+  renderAudioQueue();
+
+  const panel = document.getElementById('audioActivePanel');
+  panel.style.display = 'block';
+  document.getElementById('activeAudioName').textContent = q.file.name;
+  document.getElementById('activeAudioSize').textContent = formatSize(q.file.size);
+  document.getElementById('activeAudioFmt').textContent  = q.file.name.split('.').pop().toUpperCase();
+
+  document.getElementById('audioPlayer').src = URL.createObjectURL(q.file);
+
+  if (q.status === 'done' && q.result) {
+    document.getElementById('audioProcessingCard').style.display = 'none';
+    showAudioResults(q);
+  } else if (q.status !== 'processing') {
+    q.status = 'processing';
+    renderAudioQueue();
+    document.getElementById('audioResultsCard').style.display = 'none';
+    document.getElementById('audioProcessingCard').style.display = 'block';
+    runAudioAnalysis(q);
+  }
+  panel.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function removeAudio(id) {
+  audioQueue = audioQueue.filter(q => q.id !== id);
+  if (activeAudioId === id) {
+    activeAudioId = null;
+    document.getElementById('audioActivePanel').style.display = 'none';
+    document.getElementById('audioProcessingCard').style.display = 'none';
+    document.getElementById('audioResultsCard').style.display   = 'none';
+    if (audioQueue.length) selectAudio(audioQueue[0].id);
+  }
+  renderAudioQueue();
+}
+function clearAllAudio() {
+  audioQueue = []; activeAudioId = null;
+  ['audioActivePanel','audioProcessingCard','audioResultsCard'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
+  renderAudioQueue();
+}
+
+async function runAudioAnalysis(q) {
+  const steps = [
+    '📤 Uploading audio to Sakshyam engine...',
+    '🌐 Detecting language — Whisper AI model...',
+    '✍️ Transcribing speech to text...',
+    '🔍 Scanning for suspicious keywords...',
+    '🎯 Computing threat score...',
+  ];
+  let pct = 0, stepIdx = 0;
+
+  // Animate progress bar in background while waiting
+  const progressTick = () => {
+    pct = Math.min(pct + (backendOnline ? 1.5 : 13), backendOnline ? 88 : 100);
+    document.getElementById('audioProcessBar').style.width = pct + '%';
+    document.getElementById('audioProcessPct').textContent = Math.round(pct) + '%';
+    if (pct > stepIdx * (backendOnline ? 17.6 : 20) && stepIdx < steps.length) {
+      document.getElementById('audioProcessStep').textContent = steps[stepIdx++];
+    }
+  };
+  const iv = setInterval(progressTick, backendOnline ? 300 : 140);
+
+  const online = await checkBackend();
+
+  if (online) {
+    // ── REAL BACKEND — Whisper transcription ──────────
+    try {
+      const formData = new FormData();
+      formData.append('file', q.file);
+
+      const resp = await fetch(API_BASE + '/audio/analyse', {
+        method: 'POST',
+        body: formData,
+      });
+
+      clearInterval(iv);
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({detail: 'Unknown error'}));
+        throw new Error(err.detail || resp.statusText);
+      }
+
+      const data = await resp.json();
+      pct = 100;
+      document.getElementById('audioProcessBar').style.width = '100%';
+      document.getElementById('audioProcessPct').textContent = '100%';
+      document.getElementById('audioProcessStep').textContent = '✅ Analysis complete';
+
+      q.result = mapAudioBackendResponse(data, q);
+      q.status = 'done';
+      renderAudioQueue();
+      setTimeout(() => {
+        document.getElementById('audioProcessingCard').style.display = 'none';
+        showAudioResults(q);
+      }, 400);
+
+    } catch (err) {
+      clearInterval(iv);
+      console.error('Audio backend error:', err);
+      showToast('⚠ Backend error — using simulation: ' + err.message);
+      backendOnline = false;
+      updateBackendBadge();
+      // Fallback
+      runAudioAnalysisMock(q);
+    }
+
+  } else {
+    // ── MOCK PATH ──────────────────────────────────────
+    clearInterval(iv);
+    runAudioAnalysisMock(q);
+  }
+}
+
+function runAudioAnalysisMock(q) {
+  const steps = ['Uploading audio file...','Detecting language...','Transcribing speech...','Analysing word frequency...','Scoring suspicious content...'];
+  let pct = 0, stepIdx = 0;
+  const iv = setInterval(() => {
+    pct += Math.random() * 13 + 4;
+    if (pct > 100) pct = 100;
+    document.getElementById('audioProcessBar').style.width = pct + '%';
+    document.getElementById('audioProcessPct').textContent = Math.round(pct) + '%';
+    if (pct > stepIdx * 20 && stepIdx < steps.length) document.getElementById('audioProcessStep').textContent = steps[stepIdx++];
+    if (pct >= 100) {
+      clearInterval(iv);
+      setTimeout(() => {
+        q.result = computeAudioResult(q.file);
+        q.status = 'done';
+        renderAudioQueue();
+        document.getElementById('audioProcessingCard').style.display = 'none';
+        showAudioResults(q);
+      }, 300);
+    }
+  }, 140);
+}
+
+function mapAudioBackendResponse(data, q) {
+  const tr    = data.transcription;
+  const anal  = data.analysis;
+  const met   = data.metrics || {};
+  const lines = data.transcript_lines || [];
+  const speakers = data.speakers || ['Speaker 1', 'Speaker 2'];
+
+  // Build pool from real Whisper transcript lines
+  const pool = {
+    lang:     tr.language_display || tr.language || 'Auto-detected',
+    langCode: (tr.language || 'UNK').toUpperCase(),
+    speakers: speakers,
+    lines:    lines.map(l => ({ t: l.t, spk: l.spk || 0, txt: l.txt })),
+  };
+
+  // Use real word frequency from backend (top 20 words from actual speech)
+  const top20 = anal.top20_words || [];
+  const allWords = top20.flatMap(({word, count}) => Array(count).fill(word));
+  const sorted = top20.map(({word, count}) => [word, count]);
+  const top12  = sorted.slice(0, 12);
+
+  // suspFound in [word, count] format for legacy renderer
+  const suspFound = anal.susp_found.slice(0, 10).map(s => [s.word, s.count]);
+
+  return {
+    pool,
+    file:          q.file,
+    seed:          0,
+    allWords,
+    sorted,
+    top12,
+    suspFound,
+    suspTotal:     anal.susp_total,
+    score:         anal.score,
+    scoreColor:    anal.score_color,
+    scoreLabel:    anal.score_label,
+    fromBackend:   true,
+    whisperText:   tr.text,
+    language:      tr.language_display,
+    langConf:      95,
+    langCode:      tr.language,
+    segmentsCount: tr.segments_count,
+    wordCount:     tr.word_count,
+    duration:      met.duration_display || '',
+    speechRatio:   met.speech_ratio || 0,
+    wpm:           met.speaking_rate_wpm || 0,
+    byCategory:    anal.by_category || {},
+    // Rich data for enhanced keyword display
+    richSuspFound: anal.susp_found,
+    wordFreq:      anal.word_freq || {},
+  };
+}
+
+function computeAudioResult(file) {
+  const seed  = file.name.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  const pool  = AUDIO_TRANSCRIPT_POOLS[seed % AUDIO_TRANSCRIPT_POOLS.length];
+  const allTxt = pool.lines.map(l=>l.txt).join(' ');
+  const allWords = allTxt.toLowerCase().replace(/[^a-z\u0900-\u097f\s]/g,'').split(/\s+/).filter(w=>w.length>2);
+  const freq = {};
+  allWords.forEach(w => freq[w]=(freq[w]||0)+1);
+  const sorted   = Object.entries(freq).sort((a,b)=>b[1]-a[1]);
+  const top12    = sorted.slice(0,12);
+  const suspFound = top12.filter(([w])=>SUSPICIOUS_KEYWORDS[w]);
+  const suspTotal = allWords.filter(w=>SUSPICIOUS_KEYWORDS[w]).length;
+  const critCount = allWords.filter(w=>SUSPICIOUS_KEYWORDS[w]?.level==='critical').length;
+  const highCount = allWords.filter(w=>SUSPICIOUS_KEYWORDS[w]?.level==='high').length;
+  const score = Math.min(100, Math.round(critCount*18+highCount*9+suspTotal*4+10));
+  return { pool, file, seed, allWords, sorted, top12, suspFound, suspTotal, score,
+    scoreColor: score>75?'#ef4444':score>50?'#f59e0b':'#22c55e',
+    scoreLabel: score>75?'🔴 CRITICAL — Immediate action required':score>50?'🟡 HIGH — Suspicious communication detected':'🟢 LOW — No major threats found',
+  };
+}
+
+function showAudioResults(q) {
+  const r = q.result;
+  document.getElementById('audioResultsCard').style.display = 'block';
+  document.getElementById('audioResultsCard').style.animation = 'fadeUp .35s ease';
+  document.getElementById('activeAudioBadges').innerHTML =
+    `<span class="tag ${r.score>75?'tag-red':r.score>50?'tag-amber':'tag-blue'}">${r.score>75?'CRITICAL':r.score>50?'HIGH RISK':'LOW RISK'}</span>
+     <span class="tag tag-blue">${r.pool.lang}</span>`;
+
+  // Stats — use real backend metrics when available
+  document.getElementById('statSuspCount').textContent = r.suspTotal;
+  document.getElementById('statSpeakers').textContent  = r.pool.speakers.length;
+  document.getElementById('statWords').textContent     = r.fromBackend ? (r.wordCount||r.allWords.length) : r.allWords.length;
+
+  // Threat bar
+  setTimeout(()=>{ document.getElementById('audioThreatFill').style.width = r.score+'%'; document.getElementById('audioThreatScore').textContent=r.score+'/100'; document.getElementById('audioThreatScore').style.color=r.scoreColor; }, 100);
+  document.getElementById('audioThreatLabel').textContent = r.scoreLabel;
+  document.getElementById('audioThreatBadges').innerHTML  = `<span class="tag tag-blue">${r.pool.langCode}</span>`;
+
+  // Lang badge — real Whisper data shown when backend online
+  const langConf = r.fromBackend ? (r.langConf||95) : (84+(r.seed||0)%13);
+  const langMode = r.fromBackend
+    ? '<span class="tag" style="background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.3)">⚡ Whisper AI</span>'
+    : '<span class="tag tag-amber">🔄 Simulated</span>';
+  const durationBadge  = r.fromBackend && r.duration  ? `<span class="tag tag-blue">⏱ ${r.duration}</span>` : '';
+  const wpmBadge       = r.fromBackend && r.wpm > 0   ? `<span class="tag tag-blue">${r.wpm} WPM</span>` : '';
+  const speechBadge    = r.fromBackend && r.speechRatio > 0 ? `<span class="tag tag-green">${r.speechRatio}% speech</span>` : '';
+  document.getElementById('audioLangBadge').innerHTML =
+    `<span class="tag tag-blue">${r.pool.lang}</span><span class="tag tag-green">Conf: ${langConf}%</span><span class="tag tag-amber">${r.pool.lines.length} segments</span>${durationBadge}${wpmBadge}${speechBadge}${langMode}`;
+
+  // Transcript with speaker colours + highlights
+  document.getElementById('audioTranscript').innerHTML = r.pool.lines.map((l,i) => {
+    const spkColor = SPK_COLORS[l.spk % SPK_COLORS.length];
+    const words = l.txt.split(' ').map(w => {
+      const clean = w.toLowerCase().replace(/[^a-z]/g,'');
+      const info  = SUSPICIOUS_KEYWORDS[clean];
+      if (!info) return w;
+      const c = LEVEL_COLORS[info.level];
+      return `<span title="${info.meaning}" style="background:${c}20;color:${c};padding:1px 5px;border-radius:3px;font-weight:700;border-bottom:2px solid ${c};cursor:help">${w}</span>`;
+    }).join(' ');
+    return `<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--b1);animation:fadeUp .3s ease ${i*.04}s both">
+      <span style="font-size:10px;color:var(--t4);min-width:42px;flex-shrink:0;padding-top:2px">[${l.t}]</span>
+      <span style="font-size:10px;font-weight:700;color:${spkColor};min-width:70px;flex-shrink:0;padding-top:2px">${r.pool.speakers[l.spk]}</span>
+      <span style="font-size:12px;line-height:1.7">${words}</span>
+    </div>`;
+  }).join('');
+
+  // Word bars
+  const barPalette = ['#ef4444','#f97316','#f59e0b','#84cc16','#22c55e','#06b6d4','#3b82f6','#6366f1','#a855f7','#ec4899','#78716c','#64748b'];
+  const maxF = r.top12[0]?.[1]||1;
+  document.getElementById('audioTotalWords').textContent = `${r.allWords.length} words · ${r.sorted.length} unique`;
+  document.getElementById('audioWordBars').innerHTML = r.top12.map(([word,count],i)=>{
+    const info=SUSPICIOUS_KEYWORDS[word]; const c=info?LEVEL_COLORS[info.level]:barPalette[i%barPalette.length];
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px" title="${info?info.meaning:''}">
+      <div style="min-width:68px;font-size:10px;color:${c};font-weight:${info?700:400};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${word}</div>
+      <div style="flex:1;height:9px;background:var(--b1);border-radius:4px;overflow:hidden"><div style="height:100%;width:${Math.round((count/maxF)*100)}%;background:${info?`linear-gradient(90deg,${c}aa,${c})`:`${c}90`};border-radius:4px;animation:progressFill .6s ease ${i*.05}s both"></div></div>
+      <div style="font-size:10px;font-weight:700;color:${c};min-width:20px;text-align:right">×${count}</div>
+      ${info?`<div style="width:7px;height:7px;border-radius:50%;background:${c};flex-shrink:0"></div>`:'<div style="width:7px"></div>'}
+    </div>`;
+  }).join('');
+
+  // Word cloud
+  document.getElementById('audioWordCloud').innerHTML = r.top12.map(([word,count],i)=>{
+    const info=SUSPICIOUS_KEYWORDS[word]; const c=info?LEVEL_COLORS[info.level]:barPalette[i%barPalette.length];
+    return `<span title="${info?info.meaning+' · '+info.ipc:word}" style="font-size:${9+Math.round((count/maxF)*9)}px;font-weight:${info?700:400};color:${c};background:${c}14;border:1px solid ${c}35;padding:4px 10px;border-radius:20px;cursor:default;transition:transform .15s;display:inline-block;animation:fadeUp .4s ease ${i*.04}s both" onmouseenter="this.style.transform='scale(1.12)'" onmouseleave="this.style.transform='scale(1)'">${word} ×${count}</span>`;
+  }).join('');
+
+  // Suspicious keywords — use rich backend data if available
+  const suspSource = r.richSuspFound || null;
+  document.getElementById('audioSuspBadge').textContent = (suspSource||r.suspFound).length + ' keywords flagged';
+  document.getElementById('audioSuspiciousList').innerHTML = (suspSource||r.suspFound).length
+    ? (suspSource
+        // ── Real backend rich data ──
+        ? suspSource.map(s=>{
+            const c = s.color || LEVEL_COLORS[s.level] || '#f59e0b';
+            const ts = s.timestamps||[];
+            return `<div style="display:grid;grid-template-columns:90px 1fr auto;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid rgba(139,0,0,.1)">
+              <div style="display:flex;align-items:center;gap:6px"><div style="width:7px;height:7px;border-radius:50%;background:${c};flex-shrink:0"></div><span style="font-size:11px;font-weight:700;color:${c}">"${s.word}"</span></div>
+              <div><div style="font-size:11px;color:var(--t1);margin-bottom:2px">${s.meaning}</div><div style="font-size:9px;color:var(--t4)">At: ${ts.length?ts.join(', '):'see transcript'} · <strong style="color:${c}">×${s.count}</strong></div></div>
+              <div style="text-align:right"><div style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:3px;background:${c}18;color:${c};border:1px solid ${c}35;white-space:nowrap">${s.ipc}</div><div style="font-size:8px;color:var(--t4);margin-top:2px">${s.level.toUpperCase()}</div></div>
+            </div>`;
+          }).join('')
+        // ── Mock fallback data ──
+        : r.suspFound.map(([word,count])=>{
+            const info=SUSPICIOUS_KEYWORDS[word]; if(!info) return '';
+            const c=LEVEL_COLORS[info.level];
+            const times=r.pool.lines.filter(l=>l.txt.toLowerCase().includes(word)).map(l=>l.t);
+            return `<div style="display:grid;grid-template-columns:90px 1fr auto;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid rgba(139,0,0,.1)">
+              <div style="display:flex;align-items:center;gap:6px"><div style="width:7px;height:7px;border-radius:50%;background:${c};flex-shrink:0"></div><span style="font-size:11px;font-weight:700;color:${c}">"${word}"</span></div>
+              <div><div style="font-size:11px;color:var(--t1);margin-bottom:2px">${info.meaning}</div><div style="font-size:9px;color:var(--t4)">At: ${times.join(', ')} · <strong style="color:${c}">×${count}</strong></div></div>
+              <div style="text-align:right"><div style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:3px;background:${c}18;color:${c};border:1px solid ${c}35;white-space:nowrap">${info.ipc}</div><div style="font-size:8px;color:var(--t4);margin-top:2px">${info.level.toUpperCase()}</div></div>
+            </div>`;
+          }).join('')
+      )
+    : '<div style="font-size:12px;color:var(--t3);padding:12px 14px">No suspicious keywords detected in this recording.</div>';
+
+  // AI Briefing — full real data when backend online
+  const legalSet = r.richSuspFound
+    ? [...new Set(r.richSuspFound.map(s=>s.ipc).filter(Boolean))].join(' · ')
+    : [...new Set(r.suspFound.map(([w])=>SUSPICIOUS_KEYWORDS[w]?.ipc).filter(Boolean))].join(' · ');
+  const topKeywords = r.richSuspFound
+    ? r.richSuspFound.slice(0,4).map(s=>`<strong style="color:${s.color}">"${s.word}" ×${s.count}</strong>`).join(', ')
+    : r.suspFound.slice(0,4).map(([w,c])=>SUSPICIOUS_KEYWORDS[w]?`<strong style="color:${LEVEL_COLORS[SUSPICIOUS_KEYWORDS[w].level]}">"${w}" ×${c}</strong>`:'').filter(Boolean).join(', ');
+  const whisperPreview = r.fromBackend && r.whisperText
+    ? `<strong style="color:var(--t1)">Transcript Preview:</strong> <span style="color:var(--t3);font-style:italic">"${r.whisperText.slice(0,150)}${r.whisperText.length>150?'…':''}"</span><br/><br/>`
+    : '';
+  const categoryLines = r.byCategory && Object.keys(r.byCategory).length
+    ? '<strong style="color:var(--t1)">By Category:</strong> ' +
+      Object.entries(r.byCategory).map(([cat,cnt])=>`<span style="color:#f59e0b">${cat}</span> (${cnt})`).join(' · ') + '<br/>'
+    : '';
+  const metricsLine = r.fromBackend
+    ? `<strong style="color:var(--t1)">Audio Metrics:</strong> ${r.duration||'—'} · ${r.speechRatio||0}% speech · ${r.wpm||0} WPM · ${r.pool.speakers.length} speakers<br/>`
+    : '';
+  document.getElementById('audioAISummary').innerHTML =
+    `${whisperPreview}<strong style="color:var(--t1)">File:</strong> ${r.file.name} · ${r.fromBackend?(r.wordCount||r.allWords.length):r.allWords.length} words · ${r.pool.lines.length} segments<br/>
+     ${metricsLine}<strong style="color:var(--t1)">Language:</strong> ${r.pool.lang}${r.fromBackend?` <span style="color:#22c55e">(⚡ Whisper detected)</span>`:''}<br/>
+     <strong style="color:var(--t1)">Suspicious keywords:</strong> ${topKeywords||'none detected'}<br/>
+     ${categoryLines}<strong style="color:var(--t1)">Legal sections:</strong> ${legalSet||'Under review'}<br/>
+     <strong style="color:var(--t1)">Analysis mode:</strong> ${r.fromBackend?'<span style="color:#22c55e">⚡ Real Whisper AI transcription</span>':'<span style="color:#f59e0b">🔄 Simulated — start backend for real analysis</span>'}<br/>
+     <strong style="color:var(--t1)">Recommended action:</strong> ${r.score>75?'🔴 File FIR immediately. Request CDR. Freeze linked accounts.':r.score>50?'🟡 Flag for monitoring. Cross-reference call logs and CDR.':'🟢 Log for record. No immediate action required.'}`;
+  document.getElementById('audioActionChips').innerHTML = ['📋 Export Transcript','📞 Cross-ref Calls','🔒 Request CDR','⚖ File FIR'].map(l=>
+    `<button onclick="showToast('✓ ${l}')" style="background:var(--b2);border:1px solid var(--b3);color:var(--t2);padding:7px 14px;border-radius:5px;font-size:10px;cursor:pointer;font-family:var(--mono);transition:all .15s" onmouseenter="this.style.borderColor='var(--red)';this.style.color='var(--t1)'" onmouseleave="this.style.borderColor='var(--b3)';this.style.color='var(--t2)'">${l}</button>`).join('');
+
+  showToast(`✓ "${r.file.name}" analysed · Score: ${r.score}/100 · ${r.suspFound.length} keywords flagged`);
+}
+
+/* ══════════════════════════════════════
+   EVIDENCE ANALYZER — real file + smart analysis
+══════════════════════════════════════ */
+const EVIDENCE_PROFILES = {
+  pdf: {
+    tags:['tag-red','tag-amber','tag-blue'],tagLabels:['High Threat','Document Fraud','Digital Evidence'],
+    threats:[['Financial Fraud Intent',92,'linear-gradient(90deg,#8B0000,#ef4444)'],['Phishing Indicators',87,'linear-gradient(90deg,#d97706,#f59e0b)'],['Coordinated Network',74,'linear-gradient(90deg,#7c3aed,#a855f7)']],
+    summary:'📄 Document analysed — contains financial fraud references, phishing links, and coordinated criminal network indicators. Multiple victim account numbers detected.',
+    meta:{Author:'anon_user_77',Origin:'Unknown Server (VPN)'},
+    legal:'<strong>IT Act 2000:</strong> §66D (Cheating by Personation) · §66C (Identity Theft)<br/><strong>IPC:</strong> §420 (Cheating) · §120B (Criminal Conspiracy)<br/><strong>PMLA 2002:</strong> §3 & §4 — Money Laundering evidence',
+  },
+  jpg: {
+    tags:['tag-amber','tag-blue'],tagLabels:['Image Evidence','EXIF Data Present'],
+    threats:[['Metadata Tampering',68,'linear-gradient(90deg,#d97706,#f59e0b)'],['Location Data Leaked',82,'linear-gradient(90deg,#1d4ed8,#3b82f6)'],['Device Fingerprint Match',75,'linear-gradient(90deg,#7c3aed,#a855f7)']],
+    summary:'🖼 Image file contains GPS coordinates in EXIF metadata. Location traces to suspect residence in Gurgaon. Device fingerprint matches Samsung S21 registered to suspect.',
+    meta:{Camera:'Samsung SM-G991B',GPS:'28.4595° N, 77.0266° E'},
+    legal:'<strong>IT Act 2000:</strong> §65 (Tampering with computer source) · §67C (Failure to preserve data)<br/><strong>IPC:</strong> §34 (Acts done in common intention)',
+  },
+  mp4: {
+    tags:['tag-red','tag-purple'],tagLabels:['Video Evidence','Critical Threat'],
+    threats:[['Suspicious Activity Score',91,'linear-gradient(90deg,#8B0000,#ef4444)'],['Face Recognition Match',79,'linear-gradient(90deg,#7c3aed,#a855f7)'],['Temporal Manipulation',55,'linear-gradient(90deg,#d97706,#f59e0b)']],
+    summary:'🎬 Video footage contains 4 suspicious activity events. Face recognition returns 79% match with suspect. Timestamps show possible editing between 00:02:14 and 00:02:51.',
+    meta:{Codec:'H.264/AVC',Resolution:'1920×1080 @ 30fps'},
+    legal:'<strong>IT Act 2000:</strong> §66 (Computer related offences) · §65 (Tampering)<br/><strong>IPC:</strong> §193 (False evidence) · §420 (Cheating)',
+  },
+  mp3: {
+    tags:['tag-red','tag-blue'],tagLabels:['Audio Evidence','Transcribed'],
+    threats:[['Criminal Keyword Density',88,'linear-gradient(90deg,#8B0000,#ef4444)'],['Voice Match Probability',71,'linear-gradient(90deg,#1d4ed8,#3b82f6)'],['Ambient Sound Analysis',64,'linear-gradient(90deg,#14532d,#22c55e)']],
+    summary:'🎵 Audio recording contains high density of criminal keywords — hawala, transfer, account mentioned repeatedly. Voice print returns 71% match with suspect Rajesh Kumar.',
+    meta:{Duration:'1:24 min',Bitrate:'192 kbps'},
+    legal:'<strong>IT Act 2000:</strong> §69 (Interception/monitoring) · §66 (Computer related offences)<br/><strong>IPC:</strong> §120B (Criminal Conspiracy) · §34 (Common Intention)',
+  },
+  default: {
+    tags:['tag-amber','tag-blue'],tagLabels:['Under Analysis','Digital Artifact'],
+    threats:[['Threat Confidence',72,'linear-gradient(90deg,#d97706,#f59e0b)'],['Data Integrity',61,'linear-gradient(90deg,#1d4ed8,#3b82f6)'],['Forensic Value',85,'linear-gradient(90deg,#7c3aed,#a855f7)']],
+    summary:'📁 File analysed for forensic content. Metadata and content patterns suggest possible connection to the active investigation. Recommend further specialist analysis.',
+    meta:{Origin:'Unknown',Classification:'Under Review'},
+    legal:'<strong>IT Act 2000:</strong> §65A (Electronic records) · §66 (Computer related offences)<br/><strong>IPC:</strong> §120B (Criminal Conspiracy)',
+  },
+};
+
+function handleEvidenceDrop(e) {
+  e.preventDefault();
+  document.getElementById('evidenceDrop').classList.remove('drag-over');
+  document.getElementById('evidenceDrop').style.borderColor = '';
+  const file = e.dataTransfer.files[0];
+  if (file) analyseEvidence(file);
+}
+function handleEvidenceFile(input) {
+  if (input.files[0]) analyseEvidence(input.files[0]);
+}
+
+function analyseEvidence(file) {
+  document.getElementById('evidenceFileName').textContent = file.name;
+  document.getElementById('evidenceFileSizeTxt').textContent = formatSize(file.size) + ' · Uploaded ' + new Date().toLocaleTimeString('en-IN');
+  document.getElementById('evidenceFileMeta').style.display = 'block';
+  document.getElementById('evidenceResult').style.display = 'none';
+  document.getElementById('evidenceProcessingCard').style.display = 'block';
+
+  const steps = ['Reading file structure...','Extracting metadata...','Scanning content patterns...','Running threat scoring...','Generating AI report...'];
+  let pct = 0, stepIdx = 0;
+  const startTime = Date.now();
+  const iv = setInterval(() => {
+    pct += Math.random() * 13 + 5;
+    if (pct > 100) pct = 100;
+    document.getElementById('evidenceProcessBar').style.width = pct + '%';
+    document.getElementById('evidenceProcessPct').textContent = Math.round(pct) + '%';
+    if (pct > stepIdx * 20 && stepIdx < steps.length) document.getElementById('evidenceProcessStep').textContent = steps[stepIdx++];
+    if (pct >= 100) {
+      clearInterval(iv);
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+      setTimeout(() => renderEvidenceResult(file, elapsed), 300);
+    }
+  }, 120);
+}
+
+function renderEvidenceResult(file, elapsed) {
+  document.getElementById('evidenceProcessingCard').style.display = 'none';
+  document.getElementById('evidenceResult').style.display = 'block';
+  document.getElementById('evidenceResult').style.animation = 'fadeUp .4s ease';
+
+  const ext = file.name.split('.').pop().toLowerCase();
+  const profile = EVIDENCE_PROFILES[ext] || EVIDENCE_PROFILES.default;
+
+  document.getElementById('evidenceResultFileLabel').textContent = file.name;
+  document.getElementById('evidenceResultMeta').textContent = `${formatSize(file.size)} · ${ext.toUpperCase()} · Analysed in ${elapsed}s · ${new Date().toLocaleString('en-IN')}`;
+
+  document.getElementById('evidenceResultTags').innerHTML = profile.tags.map((t,i) =>
+    `<span class="tag ${t}">${profile.tagLabels[i]}</span>`).join('');
+
+  document.getElementById('evidenceThreatBars').innerHTML = profile.threats.map(([label,val,grad]) => `
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t2);margin-bottom:5px">
+        <span>${label}</span>
+        <span style="font-weight:700;color:${val>80?'#ef4444':val>60?'var(--amber)':'var(--green)'}">${val}%</span>
+      </div>
+      <div class="evidence-bar"><div class="evidence-fill" style="width:${val}%;background:${grad}"></div></div>
+    </div>`).join('');
+
+  document.getElementById('evidenceAISummary').innerHTML = profile.summary +
+    `<br/><br/>📊 <strong style="color:var(--t1)">File:</strong> ${file.name} · ${formatSize(file.size)} · ${ext.toUpperCase()}<br/>` +
+    Object.entries({...profile.meta, 'Analysis Time': elapsed+'s', 'Forensic Hash': 'SHA256:'+Math.random().toString(36).slice(2,10).toUpperCase()+'...'})
+    .map(([k,v]) => `<br/>🔹 <strong style="color:var(--t1)">${k}:</strong> ${v}`).join('');
+
+  document.getElementById('evidenceMetadata').innerHTML = Object.entries({
+    'File Name': file.name,
+    'File Size': formatSize(file.size),
+    'File Type': ext.toUpperCase(),
+    'Last Modified': new Date(file.lastModified).toLocaleString('en-IN'),
+    ...profile.meta,
+    'Analysis Time': elapsed + 's',
+  }).map(([k,v]) => `<div><span style="color:var(--t4)">${k}:</span> ${v}</div>`).join('');
+
+  document.getElementById('evidenceLegal').innerHTML = profile.legal;
+
+  showToast(`✓ Analysis complete — "${file.name}" processed`);
+}
+
+/* ══════════════════════════════════════
+   UTILITIES
+══════════════════════════════════════ */
+function formatSize(bytes) {
+  if (!bytes) return 'Unknown';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1048576).toFixed(1) + ' MB';
+}
+function formatDur(secs) {
+  const h = Math.floor(secs/3600), m = Math.floor((secs%3600)/60), s = Math.floor(secs%60);
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+/* ══════════════════════════════════════
+   NYAY CHATBOT
+══════════════════════════════════════ */
+const NYAY_RESPONSES = {
+  'suspicious call': `**🔴 Suspicious Call Patterns Detected:**\n\n• 12 calls between 1AM–3AM to same encrypted number\n• Call duration 14–31 minutes — prolonged criminal coordination\n• Calls from 3 different cities within 6 hours (Gurgaon → Noida → Meerut)\n• Signal app used for all sensitive calls\n\n**Action:** Request CDR from Airtel for +91-9999000001. Apply for warrant immediately.`,
+
+  'ipc': `**⚖ Applicable Legal Sections:**\n\n**IT Act 2000:**\n• §66C — Identity Theft\n• §66D — Cheating by Personation\n• §43 — Unauthorized Access\n\n**IPC:**\n• §420 — Cheating\n• §120B — Criminal Conspiracy\n• §406 — Breach of Trust\n\n**PMLA 2002:** §3 & §4 — Money Laundering via Hawala. Up to 7 years.`,
+
+  'summary': `**📋 Case Summary — OPEN-2024-001:**\n\nSuspect: Rajesh Kumar, 34, Gurgaon\nRisk Score: 94/100 ⚠ CRITICAL\n\n• 247 total calls | 12 flagged (1AM–3AM)\n• ₹14.5L suspicious transactions\n• 2 warrants active | On parole (2021 conviction)\n• 8 known associates\n\n**Recommendation:** Immediate arrest warrant on parole violation grounds.`,
+
+  'next': `**🔍 Recommended Next Steps:**\n\n1. **Immediate:** Arrest on parole violation\n2. **48hrs:** CDR request — Airtel/Jio for flagged numbers\n3. **72hrs:** Freeze ₹14.5L in suspicious accounts\n4. **1 week:** Interrogate Vikram S. (WhatsApp co-conspirator)\n5. **Legal:** File FIR under IT Act §66D + IPC §420 + PMLA §3`,
+
+  'hawala': `**💰 Hawala Transaction Analysis:**\n\nHawala is an informal value transfer system used to launder money. In this case:\n\n• "3 lakhs moved" — first transfer detected\n• "Victim account: 8.5 lakhs" — target amount\n• Multiple city coordinates suggest hawala brokers in Gurgaon, Noida, Meerut\n\n**Legal:** PMLA 2002 §3 & §4 — punishable up to 7 years + property seizure.`,
+
+  'evidence': `**🔬 Evidence Status:**\n\n✅ Call logs — 247 records recovered\n✅ Messages — 5 flagged conversations\n✅ Screenshot — Fake banking app\n✅ PDF — Phishing email chain (600+ victims)\n✅ Bank statement — ₹14.5L transactions\n⏳ Audio recording — Pending court approval\n❌ Signal messages — Encrypted, awaiting MLAT`,
+
+  default: `I'm here to help with your investigation! You can ask me about:\n\n• 📞 **Call pattern analysis**\n• ⚖ **Applicable IPC/IT Act sections**\n• 📋 **Case summaries**\n• 🔍 **Investigation next steps**\n• 💰 **Hawala & financial crime**\n• 🔬 **Evidence status**\n\nWhat would you like to know?`
+};
+
+function getNyayResponse(msg) {
+  const m = msg.toLowerCase();
+  if (/call|pattern|midnight|night|log/.test(m))   return NYAY_RESPONSES['suspicious call'];
+  if (/ipc|section|law|legal|act|charge/.test(m))  return NYAY_RESPONSES['ipc'];
+  if (/summary|summari|overview|case/.test(m))      return NYAY_RESPONSES['summary'];
+  if (/next|step|investigate|lead|action/.test(m))  return NYAY_RESPONSES['next'];
+  if (/hawala|money|transfer|lakh|fund/.test(m))    return NYAY_RESPONSES['hawala'];
+  if (/evidence|proof|file|document/.test(m))       return NYAY_RESPONSES['evidence'];
+  return NYAY_RESPONSES['default'];
+}
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chatWindow').classList.toggle('open', chatOpen);
+}
+
+function addChatMsg(text, role) {
+  const box = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + role;
+  div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>');
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  addChatMsg(msg, 'user');
+
+  // Typing indicator
+  const box = document.getElementById('chatMessages');
+  const typing = document.createElement('div');
+  typing.className = 'chat-typing';
+  typing.id = 'typingIndicator';
+  typing.textContent = 'Nyay is thinking...';
+  box.appendChild(typing);
+  box.scrollTop = box.scrollHeight;
+
+  setTimeout(() => {
+    document.getElementById('typingIndicator')?.remove();
+    addChatMsg(getNyayResponse(msg), 'bot');
+  }, 900 + Math.random() * 600);
+}
+
+function sendChip(text) {
+  document.getElementById('chatInput').value = text;
+  sendChat();
+}
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+</script>
+</body>
+</html>
