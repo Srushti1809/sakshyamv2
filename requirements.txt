@@ -1,6 +1,7 @@
 # Sakshyam Audio Intelligence Backend
 # Install: pip install -r requirements.txt
-
+setuptools
+wheel
 # Web framework
 fastapi==0.111.0
 uvicorn[standard]==0.29.0
